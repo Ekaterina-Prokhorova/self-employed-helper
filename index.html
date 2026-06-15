@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Помощник самозанятого</title>
 <style>
+  /* === СТИЛИ === */
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   body { background: #f5f6fa; color: #2c3e50; min-height: 100vh; }
   
@@ -16,176 +17,59 @@
     align-items: center; justify-content: center; color: white;
   }
   #login-screen h2 { font-size: 32px; margin-bottom: 10px; }
-  #login-screen p { margin-bottom: 25px; opacity: 0.9; }
   #login-screen input {
     padding: 14px; margin: 6px; width: 300px; max-width: 90vw;
     border: none; border-radius: 10px; font-size: 15px;
-    background: rgba(255,255,255,0.95);
   }
   #login-screen button {
     padding: 14px 28px; margin: 6px; border: none; border-radius: 10px;
-    font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+    font-size: 16px; font-weight: 600; cursor: pointer; color: white;
   }
-  #login-screen button:hover { transform: translateY(-2px); }
-  .btn-login { background: #007bff; color: white; }
-  .btn-register { background: #28a745; color: white; }
+  .btn-login { background: #007bff; }
+  .btn-register { background: #28a745; }
   
-  /* Хедер */
+  /* Основной интерфейс */
   header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    color: white; padding: 20px; text-align: center; position: relative;
   }
-  header h1 { font-size: 24px; margin-bottom: 5px; }
-  header p { opacity: 0.9; font-size: 14px; }
-  .user-bar {
-    position: absolute; top: 15px; right: 20px; font-size: 13px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .user-bar button {
-    background: rgba(255,255,255,0.2); color: white; border: none;
-    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
-  }
+  .user-bar { position: absolute; top: 15px; right: 20px; font-size: 13px; }
+  .user-bar button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
   
-  /* Табы */
-  .tabs {
-    display: flex; background: white; overflow-x: auto;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  }
-  .tab {
-    padding: 14px 20px; cursor: pointer; border: none; background: none;
-    font-size: 14px; color: #7f8c8d; white-space: nowrap; transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-  }
+  .tabs { display: flex; background: white; overflow-x: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  .tab { padding: 14px 20px; cursor: pointer; border: none; background: none; font-size: 14px; color: #7f8c8d; border-bottom: 3px solid transparent; }
   .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
   
-  /* Контент */
   .content { padding: 20px; max-width: 1200px; margin: 0 auto; }
   .section { display: none; }
   .section.active { display: block; animation: fadeIn 0.3s; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   
-  .card {
-    background: white; border-radius: 12px; padding: 20px;
-    margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
-  .card h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+  .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #667eea; }
+  .stat-card .value { font-size: 24px; font-weight: 700; }
   
-  /* Дашборд */
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px; margin-bottom: 20px;
-  }
-  .stat-card {
-    background: white; border-radius: 12px; padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #667eea;
-  }
-  .stat-card .label { font-size: 13px; color: #7f8c8d; margin-bottom: 5px; }
-  .stat-card .value { font-size: 24px; font-weight: 700; color: #2c3e50; }
-  .stat-card .sub { font-size: 12px; color: #95a5a6; margin-top: 5px; }
-  
-  /* Таблица */
   table { width: 100%; border-collapse: collapse; }
   th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
-  th { background: #f8f9fa; font-weight: 600; color: #7f8c8d; font-size: 12px; text-transform: uppercase; }
-  tr:hover { background: #f8f9fa; }
   
-  /* Кнопки */
-  .btn {
-    padding: 10px 18px; border: none; border-radius: 8px;
-    cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
+  .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; }
   .btn-primary { background: #667eea; color: white; }
-  .btn-primary:hover { background: #5568d3; }
-  .btn-success { background: #28a745; color: white; }
   .btn-danger { background: #e74c3c; color: white; }
-  .btn-secondary { background: #95a5a6; color: white; }
   .btn-sm { padding: 6px 12px; font-size: 12px; }
   
-  /* Формы */
-  .form-group { margin-bottom: 15px; }
-  .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #555; }
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
-    font-size: 14px; transition: border 0.2s;
-  }
-  .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
-  
-  /* Модальные окна */
-  .modal {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
-  }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
   .modal.active { display: flex; }
-  .modal-content {
-    background: white; border-radius: 12px; padding: 25px;
-    width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
-  }
-  .modal-content h3 { margin-bottom: 20px; }
+  .modal-content { background: white; border-radius: 12px; padding: 25px; width: 90%; max-width: 500px; }
   
-  /* Тосты */
-  .toast {
-    position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
-    border-radius: 8px; color: white; font-size: 14px; z-index: 2000;
-    animation: slideIn 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 2000; }
   .toast.green { background: #28a745; }
   .toast.red { background: #e74c3c; }
-  .toast.blue { background: #007bff; }
   
-  /* Чат */
-  .chat-container { display: flex; flex-direction: column; height: 500px; }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; }
-  .msg { margin-bottom: 12px; padding: 10px 14px; border-radius: 12px; max-width: 80%; }
-  .msg.user { background: #667eea; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-  .msg.bot { background: white; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px; }
-  .chat-input-row { display: flex; gap: 8px; }
-  .chat-input-row input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
-  .quick-questions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-  .quick-questions button {
-    padding: 8px 14px; background: #f0f0f0; border: none; border-radius: 20px;
-    cursor: pointer; font-size: 13px;
-  }
-  .quick-questions button:hover { background: #e0e0e0; }
-  
-  /* Напоминания */
-  .reminder-item {
-    display: flex; align-items: center; padding: 12px; background: white;
-    border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #f39c12;
-  }
-  .reminder-item.done { opacity: 0.6; border-left-color: #28a745; }
-  .reminder-item.done .reminder-text { text-decoration: line-through; }
-  .reminder-text { flex: 1; }
-  .reminder-text .date { font-size: 12px; color: #95a5a6; }
-  
-  /* Пустое состояние */
-  .empty { text-align: center; padding: 40px 20px; color: #95a5a6; }
-  .empty .icon { font-size: 48px; margin-bottom: 10px; }
-  
-  /* Фильтры */
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-  .filter-btn {
-    padding: 6px 12px; background: white; border: 1px solid #ddd;
-    border-radius: 20px; cursor: pointer; font-size: 13px;
-  }
-  .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
-  
-  .error { color: #e74c3c; font-size: 12px; margin-top: 4px; }
-  
-  /* Информация */
-  .info-block { margin-bottom: 20px; }
-  .info-block h3 { margin-bottom: 10px; color: #667eea; }
-  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .pro, .con { padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
-  .pro { background: #d4edda; }
-  .con { background: #f8d7da; }
-  
-  @media (max-width: 600px) {
-    .pros-cons { grid-template-columns: 1fr; }
-    .user-bar { position: static; margin-top: 10px; justify-content: center; }
-    header { padding-top: 15px; }
-  }
+  .chat-messages { height: 300px; overflow-y: auto; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; }
+  .msg { margin-bottom: 10px; padding: 10px; border-radius: 8px; max-width: 80%; }
+  .msg.user { background: #667eea; color: white; margin-left: auto; }
+  .msg.bot { background: white; border: 1px solid #ddd; }
 </style>
 </head>
 <body>
@@ -193,748 +77,197 @@
 <!-- ЭКРАН ВХОДА -->
 <div id="login-screen">
   <h2>💼 Помощник самозанятого</h2>
-  <p>Войдите или зарегистрируйтесь для доступа к данным</p>
-  <input type="email" id="login-email" placeholder="Ваш Email">
+  <p style="margin-bottom: 20px;">Войдите или зарегистрируйтесь</p>
+  <input type="email" id="login-email" placeholder="Email">
   <input type="password" id="login-pass" placeholder="Пароль">
-  <div style="margin-top: 15px;">
+  <div>
     <button class="btn-login" onclick="doLogin()">Войти</button>
     <button class="btn-register" onclick="doRegister()">Регистрация</button>
   </div>
 </div>
 
-<!-- ОСНОВНОЙ КОНТЕНТ -->
+<!-- САЙТ -->
 <div id="app-content" style="display:none;">
+  <header>
+    <h1>💼 Самозанятый</h1>
+    <div class="user-bar"><span id="user-email"></span> <button onclick="doLogout()">Выйти</button></div>
+  </header>
 
-<header style="position: relative;">
-  <h1>💼 Самозанятый</h1>
-  <p>Ваш финансовый помощник</p>
-  <div class="user-bar">
-    <span id="user-email-display"></span>
-    <button onclick="doLogout()">Выйти</button>
-  </div>
-</header>
-
-<div class="tabs">
-  <button class="tab active" data-tab="dashboard">📊 Дашборд</button>
-  <button class="tab" data-tab="incomes">💰 Доходы</button>
-  <button class="tab" data-tab="calculator">🧮 Калькулятор</button>
-  <button class="tab" data-tab="chat">🤖 AI-помощник</button>
-  <button class="tab" data-tab="info">ℹ️ Информация</button>
-  <button class="tab" data-tab="reminders">🔔 Напоминания</button>
-</div>
-
-<div class="content">
-
-  <!-- ДАШБОРД -->
-  <div class="section active" id="dashboard">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="label">Доход за месяц</div>
-        <div class="value" id="stat-month-total">0 ₽</div>
-        <div class="sub" id="stat-month-count">0 операций</div>
-      </div>
-      <div class="stat-card" style="border-left-color: #e74c3c;">
-        <div class="label">Налог за месяц</div>
-        <div class="value" id="stat-month-tax">0 ₽</div>
-        <div class="sub">К уплате</div>
-      </div>
-      <div class="stat-card" style="border-left-color: #28a745;">
-        <div class="label">Чистый доход</div>
-        <div class="value" id="stat-month-net">0 ₽</div>
-        <div class="sub">За месяц</div>
-      </div>
-      <div class="stat-card" style="border-left-color: #f39c12;">
-        <div class="label">Доход за год</div>
-        <div class="value" id="stat-year-total">0 ₽</div>
-        <div class="sub" id="stat-year-limit">Остаток лимита: 2 400 000 ₽</div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <h2>Быстрые действия</h2>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="btn btn-primary" onclick="openModal('income-modal')">💰 Добавить доход</button>
-        <button class="btn btn-success" onclick="switchTab('calculator')">🧮 Рассчитать налог</button>
-        <button class="btn btn-secondary" onclick="switchTab('chat')">🤖 Задать вопрос AI</button>
-      </div>
-    </div>
-    
-    <div class="card">
-      <h2>Последние доходы</h2>
-      <div id="dashboard-recent"></div>
-    </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard')">📊 Дашборд</button>
+    <button class="tab" onclick="switchTab('incomes')">💰 Доходы</button>
+    <button class="tab" onclick="switchTab('chat')">🤖 AI</button>
   </div>
 
-  <!-- ДОХОДЫ -->
-  <div class="section" id="incomes">
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-        <h2 style="margin: 0;">💰 Доходы</h2>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Экспорт CSV</button>
-          <button class="btn btn-primary btn-sm" onclick="openModal('income-modal')">+ Добавить</button>
-        </div>
+  <div class="content">
+    <!-- ДАШБОРД -->
+    <div id="dashboard" class="section active">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">Доход за месяц</div><div class="value" id="st-month">0 ₽</div></div>
+        <div class="stat-card" style="border-color:#e74c3c"><div class="label">Налог</div><div class="value" id="st-tax">0 ₽</div></div>
       </div>
-      
-      <div class="filters">
-        <button class="filter-btn active" data-filter-period="all">Все</button>
-        <button class="filter-btn" data-filter-period="month">Этот месяц</button>
-        <button class="filter-btn" data-filter-period="quarter">Квартал</button>
-        <button class="filter-btn" data-filter-period="year">Этот год</button>
-        <button class="filter-btn active" data-filter-client="all">Все клиенты</button>
-        <button class="filter-btn" data-filter-client="individual">Физлица</button>
-        <button class="filter-btn" data-filter-client="legal">Юрлица</button>
-      </div>
-      
-      <div style="margin-bottom: 10px; font-size: 14px; color: #7f8c8d;">
-        Итого: <strong id="incomes-total" style="color: #2c3e50;">0 ₽</strong>
-      </div>
-      
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr><th>Дата</th><th>Описание</th><th>Сумма</th><th>Клиент</th><th>Налог</th><th></th></tr>
-          </thead>
-          <tbody id="incomes-tbody"></tbody>
-        </table>
-      </div>
-      <div id="incomes-empty" class="empty" style="display:none;">
-        <div class="icon">💸</div>
-        <p>Пока нет доходов</p>
-        <button class="btn btn-primary" style="margin-top: 10px;" onclick="openModal('income-modal')">+ Добавить первый</button>
+      <button class="btn btn-primary" onclick="openModal('income-modal')">+ Добавить доход</button>
+    </div>
+
+    <!-- ДОХОДЫ -->
+    <div id="incomes" class="section">
+      <div class="card">
+        <h2>История доходов</h2>
+        <table><thead><tr><th>Дата</th><th>Описание</th><th>Сумма</th><th></th></tr></thead><tbody id="inc-list"></tbody></table>
       </div>
     </div>
-  </div>
 
-  <!-- КАЛЬКУЛЯТОР -->
-  <div class="section" id="calculator">
-    <div class="card">
-      <h2>🧮 Калькулятор налога</h2>
-      <p style="color: #7f8c8d; margin-bottom: 15px;">НПД: 4% или 6%</p>
-      
-      <div class="form-group">
-        <label>Сумма дохода (₽)</label>
-        <input type="number" id="calc-amount" placeholder="100000">
-      </div>
-      <div class="form-group">
-        <label>Ставка налога</label>
-        <select id="calc-rate">
-          <option value="4">4% — физические лица</option>
-          <option value="6">6% — юридические лица</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="calculateTax()">Рассчитать</button>
-      
-      <div id="calc-result" style="margin-top: 20px; display:none;">
-        <div class="stat-card">
-          <div class="label">Сумма дохода</div>
-          <div class="value" id="calc-r-amount">—</div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-          <div class="stat-card" style="border-left-color: #e74c3c;">
-            <div class="label">Ставка / Налог</div>
-            <div class="value" id="calc-r-tax">—</div>
-          </div>
-          <div class="stat-card" style="border-left-color: #28a745;">
-            <div class="label">Чистый доход</div>
-            <div class="value" id="calc-r-net">—</div>
-          </div>
-        </div>
-        <div id="calc-limit-warning" style="display:none; margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #f39c12; border-radius: 6px;">
-          ⚠️ <strong>Внимание:</strong> доход превышает лимит 2 400 000 ₽. Требуется переход на другой налоговый режим.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- AI ЧАТ -->
-  <div class="section" id="chat">
-    <div class="card">
-      <h2>🤖 AI-помощник</h2>
-      <p style="color: #7f8c8d; margin-bottom: 15px;">Вопросы по самозанятости</p>
-      
-      <div class="quick-questions">
-        <button onclick="askQuick('Как зарегистрироваться?')">Как зарегистрироваться?</button>
-        <button onclick="askQuick('Какой налог я плачу?')">Какой налог я плачу?</button>
-        <button onclick="askQuick('Какие ограничения?')">Какие ограничения?</button>
-        <button onclick="askQuick('Нужна ли касса?')">Нужна ли касса?</button>
-      </div>
-      
-      <div class="chat-container">
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Задайте вопрос..." onkeypress="if(event.key==='Enter') sendChat()">
+    <!-- ЧАТ -->
+    <div id="chat" class="section">
+      <div class="card">
+        <h2>AI-помощник</h2>
+        <div class="chat-messages" id="chat-box"></div>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="chat-in" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;" placeholder="Вопрос...">
           <button class="btn btn-primary" onclick="sendChat()">Отправить</button>
-          <button class="btn btn-secondary btn-sm" onclick="clearChat()">🗑</button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- ИНФОРМАЦИЯ -->
-  <div class="section" id="info">
-    <div class="card">
-      <h2>ℹ️ Всё о самозанятости в России</h2>
-      
-      <div class="info-block">
-        <h3>Что такое самозанятость?</h3>
-        <p>Самозанятость (НПД — налог на профессиональный доход) — специальный налоговый режим для тех, кто работает на себя. Действует с 2019 года, позволяет легально получать доход и платить минимальный налог без бухгалтера, отчётности и онлайн-кассы.</p>
-      </div>
-      
-      <div class="info-block">
-        <h3>Преимущества и недостатки</h3>
-        <div class="pros-cons">
-          <div>
-            <div class="pro">✅ Низкий налог: 4% или 6%</div>
-            <div class="pro">✅ Регистрация за 5 минут в приложении</div>
-            <div class="pro">✅ Нет деклараций и отчётности</div>
-            <div class="pro">✅ Всё онлайн: чеки, налоги, регистрация</div>
-          </div>
-          <div>
-            <div class="con">❌ Лимит дохода: 2.4 млн ₽/год</div>
-            <div class="con">❌ Нельзя нанимать сотрудников</div>
-            <div class="con">❌ Ограничения по видам деятельности</div>
-            <div class="con">❌ Нельзя перепродавать товары</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="info-block">
-        <h3>Как зарегистрироваться</h3>
-        <ol style="padding-left: 20px; line-height: 1.8;">
-          <li>Скачайте приложение «Мой налог»</li>
-          <li>Зарегистрируйтесь по паспорту — займёт около 5 минут</li>
-          <li>Выберите виды деятельности (можно несколько)</li>
-          <li>Начните работать и выдавать чеки клиентам через приложение</li>
-        </ol>
-      </div>
-      
-      <div class="info-block">
-        <h3>Полезные ссылки</h3>
-        <p><a href="https://nalog.ru" target="_blank">🏛 nalog.ru — ФНС России</a></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- НАПОМИНАНИЯ -->
-  <div class="section" id="reminders">
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2 style="margin: 0;">🔔 Напоминания</h2>
-        <button class="btn btn-primary btn-sm" onclick="openModal('reminder-modal')">+ Добавить</button>
-      </div>
-      <div id="reminders-list"></div>
-      <div id="reminders-empty" class="empty" style="display:none;">
-        <div class="icon">🔔</div>
-        <p>Нет напоминаний</p>
-        <button class="btn btn-primary" style="margin-top: 10px;" onclick="openModal('reminder-modal')">+ Добавить первое</button>
-      </div>
-    </div>
-  </div>
-
-</div>
 </div>
 
-<!-- МОДАЛКИ -->
+<!-- МОДАЛКА ДОХОДА -->
 <div class="modal" id="income-modal">
   <div class="modal-content">
-    <h3>Добавить доход</h3>
-    <div class="form-group">
-      <label>Описание услуги *</label>
-      <input type="text" id="f-desc" placeholder="Например: Дизайн логотипа">
-      <div class="error" id="err-desc" style="display:none;">Минимум 5 символов</div>
-    </div>
-    <div class="form-group">
-      <label>Сумма (₽) *</label>
-      <input type="number" id="f-amount" placeholder="50000">
-      <div class="error" id="err-amount" style="display:none;">Введите сумму больше 0</div>
-    </div>
-    <div class="form-group">
-      <label>Дата</label>
-      <input type="date" id="f-date">
-    </div>
-    <div class="form-group">
-      <label>Тип клиента</label>
-      <select id="f-type">
-        <option value="individual">Физическое лицо (4%)</option>
-        <option value="legal">Юридическое лицо (6%)</option>
-      </select>
-    </div>
-    <input type="hidden" id="income-edit-id" value="">
-    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-      <button class="btn btn-secondary" onclick="closeModal('income-modal')">Отмена</button>
+    <h3>Новый доход</h3>
+    <input type="text" id="f-desc" placeholder="Описание" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:6px;">
+    <input type="number" id="f-amount" placeholder="Сумма" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:6px;">
+    <select id="f-type" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:6px;">
+      <option value="individual">Физлицо (4%)</option>
+      <option value="legal">Юрлицо (6%)</option>
+    </select>
+    <div style="text-align:right; margin-top:15px;">
+      <button class="btn" onclick="closeModal('income-modal')">Отмена</button>
       <button class="btn btn-primary" onclick="submitIncome()">Сохранить</button>
     </div>
   </div>
 </div>
 
-<div class="modal" id="reminder-modal">
-  <div class="modal-content">
-    <h3>Добавить напоминание</h3>
-    <div class="form-group">
-      <label>Дата платежа *</label>
-      <input type="date" id="r-date">
-    </div>
-    <div class="form-group">
-      <label>Сумма (₽) *</label>
-      <input type="number" id="r-amount" placeholder="5000">
-    </div>
-    <div class="form-group">
-      <label>Описание *</label>
-      <input type="text" id="r-desc" placeholder="Налог за квартал">
-    </div>
-    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-      <button class="btn btn-secondary" onclick="closeModal('reminder-modal')">Отмена</button>
-      <button class="btn btn-primary" onclick="submitReminder()">Добавить</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="confirm-modal">
-  <div class="modal-content">
-    <h3>Подтверждение</h3>
-    <p id="confirm-text">Вы уверены?</p>
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-      <button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Отмена</button>
-      <button class="btn btn-danger" id="confirm-btn">Удалить</button>
-    </div>
-  </div>
-</div>
-
 <script>
-// ============ НАСТРОЙКИ ============
+// === НАСТРОЙКИ ===
 const API_URL = 'https://katrtrtrtrtrtrtr-self-employed-helper.hf.space';
-let authToken = localStorage.getItem('authToken');
-let userEmail = localStorage.getItem('userEmail');
+let token = localStorage.getItem('authToken');
 
-let incomes = [];
-let reminders = [];
-let chatHistory = [];
-let filterPeriod = 'all';
-let filterClient = 'all';
-
-// ============ АВТОРИЗАЦИЯ ============
+// === АВТОРИЗАЦИЯ ===
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  if (!email || !pass) { toast('Заполните все поля', 'red'); return; }
-  
+  const e = document.getElementById('login-email').value;
+  const p = document.getElementById('login-pass').value;
   try {
-    const res = await fetch(`${API_URL}/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`, { method: 'POST' });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Ошибка входа'); }
-    const data = await res.json();
-    authToken = data.access_token;
-    userEmail = email;
-    localStorage.setItem('authToken', authToken);
-    localStorage.setItem('userEmail', email);
-    showApp();
-    toast('Добро пожаловать!', 'green');
-  } catch (e) { toast(e.message, 'red'); }
+    const r = await fetch(`${API_URL}/login?email=${e}&password=${p}`, {method:'POST'});
+    if(!r.ok) throw new Error('Ошибка входа');
+    const d = await r.json();
+    saveAuth(d.access_token, e);
+  } catch(err) { alert(err.message); }
 }
 
 async function doRegister() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  if (!email || !pass) { toast('Заполните все поля', 'red'); return; }
-  if (pass.length < 4) { toast('Пароль минимум 4 символа', 'red'); return; }
-  
+  const e = document.getElementById('login-email').value;
+  const p = document.getElementById('login-pass').value;
   try {
-    const res = await fetch(`${API_URL}/register`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ email, password: pass })
+    const r = await fetch(`${API_URL}/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email:e, password:p})
     });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Ошибка регистрации'); }
-    const data = await res.json();
-    authToken = data.access_token;
-    userEmail = email;
-    localStorage.setItem('authToken', authToken);
-    localStorage.setItem('userEmail', email);
-    showApp();
-    toast('Регистрация успешна!', 'green');
-  } catch (e) { toast(e.message, 'red'); }
+    if(!r.ok) throw new Error('Ошибка регистрации');
+    const d = await r.json();
+    saveAuth(d.access_token, e);
+  } catch(err) { alert(err.message); }
+}
+
+function saveAuth(t, email) {
+  token = t;
+  localStorage.setItem('authToken', t);
+  localStorage.setItem('userEmail', email);
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  document.getElementById('user-email').textContent = email;
+  loadData();
 }
 
 function doLogout() {
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userEmail');
+  localStorage.clear();
   location.reload();
 }
 
-// ============ API ЗАПРОСЫ ============
-async function api(endpoint, method = 'GET', body = null) {
-  const headers = { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' };
-  const res = await fetch(`${API_URL}${endpoint}`, { method, headers, body: body ? JSON.stringify(body) : null });
-  if (res.status === 401) { doLogout(); throw new Error('Сессия истекла'); }
-  if (!res.ok) {
-    let msg = 'Ошибка';
-    try { const e = await res.json(); msg = e.detail || msg; } catch(e){}
-    throw new Error(msg);
-  }
-  return res;
+// === ЗАПРОСЫ ===
+async function api(path, method='GET', body=null) {
+  const h = {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'};
+  const r = await fetch(API_URL + path, {method, headers:h, body: body ? JSON.stringify(body) : null});
+  if(r.status===401) doLogout();
+  return r.json();
 }
 
-// ============ ЗАГРУЗКА ДАННЫХ ============
-async function loadIncomes() {
-  try {
-    const res = await api(`/incomes?period=${filterPeriod}&client_type=${filterClient}`);
-    incomes = await res.json();
-    renderIncomes();
-    renderDashboard();
-  } catch (e) { console.error(e); }
+// === ЛОГИКА ===
+async function loadData() {
+  const inc = await api('/incomes');
+  const stats = await api('/stats/summary');
+  
+  // Статистика
+  document.getElementById('st-month').textContent = Math.round(stats.month_total) + ' ₽';
+  document.getElementById('st-tax').textContent = Math.round(stats.month_tax) + ' ₽';
+  
+  // Таблица
+  const tbody = document.getElementById('inc-list');
+  tbody.innerHTML = inc.map(i => 
+    `<tr><td>${i.date}</td><td>${i.description}</td><td>${i.amount} ₽</td><td>${i.tax_rate}%</td></tr>`
+  ).join('');
 }
 
-async function loadReminders() {
-  try {
-    const res = await api('/reminders');
-    reminders = await res.json();
-    renderReminders();
-  } catch (e) { console.error(e); }
-}
-
-async function loadStats() {
-  try {
-    const res = await api('/stats/summary');
-    const s = await res.json();
-    document.getElementById('stat-month-total').textContent = fmt(s.month_total) + ' ₽';
-    document.getElementById('stat-month-tax').textContent = fmt(s.month_tax) + ' ₽';
-    document.getElementById('stat-month-net').textContent = fmt(s.month_net) + ' ₽';
-    document.getElementById('stat-month-count').textContent = s.month_count + ' операций';
-    document.getElementById('stat-year-total').textContent = fmt(s.year_total) + ' ₽';
-    document.getElementById('stat-year-limit').textContent = 'Остаток лимита: ' + fmt(s.year_limit_remaining) + ' ₽';
-  } catch (e) { console.error(e); }
-}
-
-async function loadChatHistory() {
-  try {
-    const res = await api('/chat/history');
-    chatHistory = await res.json();
-    renderChatHistory();
-  } catch (e) { console.error(e); }
-}
-
-// ============ ДОХОДЫ ============
 async function submitIncome() {
-  const desc = document.getElementById('f-desc').value.trim();
-  const amount = parseFloat(document.getElementById('f-amount').value);
-  const date = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
+  const desc = document.getElementById('f-desc').value;
+  const amount = document.getElementById('f-amount').value;
   const type = document.getElementById('f-type').value;
   
-  let valid = true;
-  if (desc.length < 5) { document.getElementById('err-desc').style.display = 'block'; valid = false; }
-  else document.getElementById('err-desc').style.display = 'none';
-  if (!amount || amount <= 0) { document.getElementById('err-amount').style.display = 'block'; valid = false; }
-  else document.getElementById('err-amount').style.display = 'none';
-  if (!valid) return;
+  if(!desc || !amount) return alert('Заполните поля');
   
-  try {
-    await api('/incomes', 'POST', { date, description: desc, amount, client_type: type });
-    toast('Доход добавлен', 'green');
-    closeModal('income-modal');
-    document.getElementById('f-desc').value = '';
-    document.getElementById('f-amount').value = '';
-    await loadIncomes();
-    await loadStats();
-  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
-}
-
-async function deleteIncome(id) {
-  showConfirm('Удалить этот доход?', async () => {
-    try {
-      await api(`/incomes/${id}`, 'DELETE');
-      toast('Удалено', 'green');
-      await loadIncomes();
-      await loadStats();
-    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
+  await api('/incomes', 'POST', {
+    date: new Date().toISOString().slice(0,10),
+    description: desc,
+    amount: parseFloat(amount),
+    client_type: type
   });
+  
+  closeModal('income-modal');
+  loadData();
+  alert('Сохранено!');
 }
 
-function renderIncomes() {
-  const tbody = document.getElementById('incomes-tbody');
-  const empty = document.getElementById('incomes-empty');
-  
-  if (incomes.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    document.getElementById('incomes-total').textContent = '0 ₽';
-    return;
-  }
-  empty.style.display = 'none';
-  
-  let total = 0;
-  tbody.innerHTML = incomes.map(i => {
-    const tax = i.amount * i.tax_rate / 100;
-    total += i.amount;
-    const clientLabel = i.client_type === 'individual' ? 'Физлицо' : 'Юрлицо';
-    return `<tr>
-      <td>${i.date}</td>
-      <td>${escapeHtml(i.description)}</td>
-      <td><strong>${fmt(i.amount)} ₽</strong></td>
-      <td>${clientLabel} (${i.tax_rate}%)</td>
-      <td>${fmt(tax)} ₽</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteIncome(${i.id})">×</button></td>
-    </tr>`;
-  }).join('');
-  
-  document.getElementById('incomes-total').textContent = fmt(total) + ' ₽';
-}
-
-function renderDashboard() {
-  const recent = incomes.slice(0, 5);
-  const el = document.getElementById('dashboard-recent');
-  if (recent.length === 0) {
-    el.innerHTML = '<p style="color:#95a5a6; text-align:center; padding:20px;">Нет доходов</p>';
-    return;
-  }
-  el.innerHTML = '<table style="width:100%;">' + recent.map(i => `
-    <tr><td>${i.date}</td><td>${escapeHtml(i.description)}</td><td style="text-align:right;"><strong>${fmt(i.amount)} ₽</strong></td></tr>
-  `).join('') + '</table>';
-}
-
-// ============ НАПОМИНАНИЯ ============
-async function submitReminder() {
-  const date = document.getElementById('r-date').value;
-  const amount = parseFloat(document.getElementById('r-amount').value);
-  const desc = document.getElementById('r-desc').value.trim();
-  
-  if (!date || !amount || !desc) { toast('Заполните все поля', 'red'); return; }
-  
-  try {
-    await api('/reminders', 'POST', { date, amount, description: desc });
-    toast('Напоминание добавлено', 'green');
-    closeModal('reminder-modal');
-    document.getElementById('r-date').value = '';
-    document.getElementById('r-amount').value = '';
-    document.getElementById('r-desc').value = '';
-    await loadReminders();
-  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
-}
-
-async function toggleReminder(id) {
-  try {
-    await api(`/reminders/${id}/toggle`, 'PATCH');
-    await loadReminders();
-  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
-}
-
-async function deleteReminder(id) {
-  showConfirm('Удалить напоминание?', async () => {
-    try {
-      await api(`/reminders/${id}`, 'DELETE');
-      toast('Удалено', 'green');
-      await loadReminders();
-    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
-  });
-}
-
-function renderReminders() {
-  const list = document.getElementById('reminders-list');
-  const empty = document.getElementById('reminders-empty');
-  
-  if (reminders.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  
-  list.innerHTML = reminders.map(r => `
-    <div class="reminder-item ${r.done ? 'done' : ''}">
-      <input type="checkbox" ${r.done ? 'checked' : ''} onchange="toggleReminder(${r.id})" style="margin-right:12px; width:20px; height:20px; cursor:pointer;">
-      <div class="reminder-text">
-        <div class="reminder-date">📅 ${r.date}</div>
-        <div><strong>${escapeHtml(r.description)}</strong> — ${fmt(r.amount)} ₽</div>
-      </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteReminder(${r.id})">×</button>
-    </div>
-  `).join('');
-}
-
-// ============ КАЛЬКУЛЯТОР ============
-function calculateTax() {
-  const amount = parseFloat(document.getElementById('calc-amount').value);
-  const rate = parseInt(document.getElementById('calc-rate').value);
-  if (!amount || amount <= 0) { toast('Введите сумму', 'red'); return; }
-  
-  const tax = amount * rate / 100;
-  const net = amount - tax;
-  
-  document.getElementById('calc-r-amount').textContent = fmt(amount) + ' ₽';
-  document.getElementById('calc-r-tax').textContent = rate + '% / ' + fmt(tax) + ' ₽';
-  document.getElementById('calc-r-net').textContent = fmt(net) + ' ₽';
-  document.getElementById('calc-limit-warning').style.display = amount > 2400000 ? 'block' : 'none';
-  document.getElementById('calc-result').style.display = 'block';
-}
-
-// ============ AI ЧАТ ============
 async function sendChat() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if (!text) return;
+  const txt = document.getElementById('chat-in').value;
+  if(!txt) return;
   
-  input.value = '';
-  appendMsg('user', text);
-  showTyping();
+  const box = document.getElementById('chat-box');
+  box.innerHTML += `<div class="msg user">${txt}</div>`;
+  document.getElementById('chat-in').value = '';
   
-  try {
-    const res = await api('/chat/send', 'POST', { text });
-    const data = await res.json();
-    removeTyping();
-    appendMsg('bot', data.reply);
-  } catch (e) {
-    removeTyping();
-    appendMsg('bot', '⚠️ Ошибка: ' + e.message);
-  }
+  const res = await api('/chat/send', 'POST', {text: txt});
+  box.innerHTML += `<div class="msg bot">${res.reply}</div>`;
+  box.scrollTop = box.scrollHeight;
 }
 
-function askQuick(text) {
-  document.getElementById('chat-input').value = text;
-  sendChat();
-}
-
-async function clearChat() {
-  showConfirm('Очистить историю чата?', async () => {
-    try {
-      await api('/chat/clear', 'DELETE');
-      chatHistory = [];
-      document.getElementById('chat-messages').innerHTML = '';
-      toast('Чат очищен', 'green');
-    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
-  });
-}
-
-function appendMsg(role, text) {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.textContent = text;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function showTyping() {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg bot';
-  div.id = 'typing-indicator';
-  div.innerHTML = '<em>Печатает...</em>';
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function removeTyping() {
-  const el = document.getElementById('typing-indicator');
-  if (el) el.remove();
-}
-
-function renderChatHistory() {
-  const container = document.getElementById('chat-messages');
-  container.innerHTML = '';
-  chatHistory.forEach(m => appendMsg(m.role === 'assistant' ? 'bot' : 'user', m.text));
-}
-
-// ============ ЭКСПОРТ CSV ============
-async function exportCSV() {
-  try {
-    const res = await fetch(`${API_URL}/export/csv`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (!res.ok) throw new Error('Ошибка экспорта');
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'incomes.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast('CSV скачан', 'green');
-  } catch (e) { toast(e.message, 'red'); }
-}
-
-// ============ УТИЛИТЫ ============
-function fmt(n) {
-  return new Intl.NumberFormat('ru-RU').format(Math.round(n || 0));
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function toast(msg, color = 'blue') {
-  const t = document.createElement('div');
-  t.className = 'toast ' + color;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-function openModal(id) {
-  document.getElementById(id).classList.add('active');
-  if (id === 'income-modal') {
-    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-  }
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-function showConfirm(text, onConfirm) {
-  document.getElementById('confirm-text').textContent = text;
-  const btn = document.getElementById('confirm-btn');
-  const newBtn = btn.cloneNode(true);
-  btn.parentNode.replaceChild(newBtn, btn);
-  newBtn.onclick = () => { onConfirm(); closeModal('confirm-modal'); };
-  openModal('confirm-modal');
-}
-
-function switchTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+// === УТИЛИТЫ ===
+function switchTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-  document.getElementById(tabName).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
 }
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-});
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-document.querySelectorAll('.filter-btn[data-filter-period]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn[data-filter-period]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterPeriod = btn.dataset.filterPeriod;
-    loadIncomes();
-  });
-});
-
-document.querySelectorAll('.filter-btn[data-filter-client]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn[data-filter-client]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterClient = btn.dataset.filterClient;
-    loadIncomes();
-  });
-});
-
-function showApp() {
+// Старт
+if(token) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-content').style.display = 'block';
-  document.getElementById('user-email-display').textContent = userEmail || '';
-  loadIncomes();
-  loadReminders();
-  loadStats();
-  loadChatHistory();
+  document.getElementById('user-email').textContent = localStorage.getItem('userEmail');
+  loadData();
 }
-
-window.onload = () => {
-  if (authToken) showApp();
-  else document.getElementById('login-screen').style.display = 'flex';
-};
 </script>
-
 </body>
 </html>
