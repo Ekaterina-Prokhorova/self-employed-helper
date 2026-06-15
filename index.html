@@ -5,1226 +5,936 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Помощник самозанятого</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --primary:#4F46E5;--primary-dark:#3730A3;--secondary:#7C3AED;
-  --accent:#10B981;--accent-dark:#059669;--danger:#EF4444;--warn:#F59E0B;
-  --bg1:#667eea;--bg2:#764ba2;
-  --text:#1F2937;--text-muted:#6B7280;--text-light:#9CA3AF;
-  --card:#fff;--border:#E5E7EB;
-  --radius:12px;--shadow:0 10px 30px rgba(0,0,0,.18);--shadow-sm:0 2px 8px rgba(0,0,0,.08);
-  --trans:.3s ease;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));min-height:100vh;color:var(--text);font-size:15px;line-height:1.5}
-a{text-decoration:none;color:inherit}
-button{cursor:pointer;font-family:inherit;border:none;outline:none}
-input,textarea,select{font-family:inherit;outline:none}
-
-/* LAYOUT */
-.app{display:flex;min-height:100vh}
-.sidebar{width:240px;min-height:100vh;background:rgba(255,255,255,.12);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:var(--trans)}
-.sidebar-logo{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.15)}
-.sidebar-logo h1{color:#fff;font-size:17px;font-weight:700;letter-spacing:-.3px}
-.sidebar-logo p{color:rgba(255,255,255,.65);font-size:12px;margin-top:2px}
-.nav{flex:1;padding:16px 10px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,.8);font-size:14px;font-weight:500;cursor:pointer;transition:var(--trans);position:relative;margin-bottom:2px}
-.nav-item:hover{background:rgba(255,255,255,.15);color:#fff}
-.nav-item.active{background:rgba(255,255,255,.22);color:#fff;font-weight:600}
-.nav-item .nav-icon{font-size:18px;width:22px;text-align:center}
-.nav-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--danger);color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
-.main-content{flex:1;margin-left:240px;padding:28px;min-height:100vh}
-.page{display:none;animation:fadeIn .3s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* CARDS */
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px}
-.card-title{font-size:14px;color:var(--text-muted);font-weight:500;margin-bottom:4px}
-.card-value{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px}
-.card-sub{font-size:12px;color:var(--text-light);margin-top:4px}
-
-/* GRID */
-.grid{display:grid;gap:16px}
-.grid-4{grid-template-columns:repeat(4,1fr)}
-.grid-3{grid-template-columns:repeat(3,1fr)}
-.grid-2{grid-template-columns:repeat(2,1fr)}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:9px;font-size:14px;font-weight:600;transition:var(--trans);cursor:pointer;border:none}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(79,70,229,.35)}
-.btn-accent{background:var(--accent);color:#fff}
-.btn-accent:hover{background:var(--accent-dark);transform:translateY(-1px)}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{opacity:.85}
-.btn-ghost{background:rgba(79,70,229,.1);color:var(--primary)}
-.btn-ghost:hover{background:rgba(79,70,229,.18)}
-.btn-sm{padding:6px 12px;font-size:12px}
-.btn:disabled{opacity:.6;pointer-events:none}
-.btn-spin::after{content:'';display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-left:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* INPUTS */
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}
-.form-control{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;color:var(--text);background:#fff;transition:var(--trans)}
-.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
-.form-control.error{border-color:var(--danger)}
-.form-error{font-size:12px;color:var(--danger);margin-top:4px;display:none}
-.form-error.show{display:block}
-select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-
-/* PAGE HEADER */
-.page-header{margin-bottom:24px}
-.page-header h2{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.4px}
-.page-header p{color:rgba(255,255,255,.7);font-size:14px;margin-top:3px}
-.page-header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-
-/* STAT CARDS */
-.stat-cards{margin-bottom:24px}
-.stat-card{padding:20px;border-left:4px solid var(--primary)}
-.stat-card.green{border-color:var(--accent)}
-.stat-card.purple{border-color:var(--secondary)}
-.stat-card.yellow{border-color:var(--warn)}
-
-/* CHART */
-.chart-wrap{padding:20px;margin-bottom:24px}
-.chart-title{font-size:15px;font-weight:600;margin-bottom:16px}
-.chart-bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:28px;position:relative;border-bottom:2px solid var(--border)}
-.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;gap:4px}
-.chart-bar{width:100%;background:linear-gradient(to top,var(--primary),var(--secondary));border-radius:5px 5px 0 0;transition:height .5s ease;min-height:2px;cursor:pointer}
-.chart-bar:hover{opacity:.8}
-.chart-label{font-size:11px;color:var(--text-muted);white-space:nowrap;margin-top:6px;position:absolute;bottom:-22px}
-.chart-amount{font-size:10px;color:var(--text-muted);white-space:nowrap}
-
-/* TABLE */
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);padding:10px 14px;border-bottom:2px solid var(--border);white-space:nowrap}
-td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#F9FAFB}
-.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
-.badge-blue{background:rgba(79,70,229,.1);color:var(--primary)}
-.badge-purple{background:rgba(124,58,237,.1);color:var(--secondary)}
-
-/* EMPTY STATE */
-.empty-state{text-align:center;padding:48px 20px;color:var(--text-muted)}
-.empty-state .icon{font-size:48px;margin-bottom:12px}
-.empty-state h3{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text)}
-.empty-state p{font-size:14px;margin-bottom:16px}
-
-/* TOAST */
-.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{padding:12px 18px;border-radius:10px;color:#fff;font-size:14px;font-weight:500;box-shadow:var(--shadow);animation:slideIn .3s ease;display:flex;align-items:center;gap:8px;max-width:320px}
-.toast.green{background:#10B981}
-.toast.red{background:#EF4444}
-.toast.blue{background:#3B82F6}
-.toast.out{animation:slideOut .3s ease forwards}
-@keyframes slideIn{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
-@keyframes slideOut{to{opacity:0;transform:translateX(60px)}}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:440px;box-shadow:var(--shadow);animation:modalIn .3s ease}
-.modal h3{font-size:18px;font-weight:700;margin-bottom:18px}
-@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-
-/* PROGRESS BAR */
-.progress-wrap{margin:10px 0}
-.progress-track{height:10px;background:var(--border);border-radius:6px;overflow:hidden}
-.progress-fill{height:100%;border-radius:6px;background:linear-gradient(to right,var(--accent),var(--primary));transition:width .6s ease}
-.progress-fill.warn{background:linear-gradient(to right,var(--warn),var(--danger))}
-.progress-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:4px}
-
-/* FILTERS */
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.filter-select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#fff;cursor:pointer}
-.filter-select:focus{border-color:var(--primary)}
-.filters-total{margin-left:auto;font-size:14px;font-weight:600;color:var(--text)}
-
-/* CHAT */
-.chat-wrap{display:flex;flex-direction:column;height:520px}
-.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#F9FAFB;border-radius:10px;margin-bottom:12px}
-.chat-msg{max-width:75%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.55}
-.chat-msg.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.chat-msg.bot{background:#fff;color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--shadow-sm)}
-.chat-msg.typing span{display:inline-block;width:7px;height:7px;background:var(--text-muted);border-radius:50%;margin:0 2px;animation:bounce .9s infinite}
-.chat-msg.typing span:nth-child(2){animation-delay:.15s}
-.chat-msg.typing span:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,60%,100%{transform:none}30%{transform:translateY(-6px)}}
-.chat-input-wrap{display:flex;gap:10px;align-items:flex-end}
-.chat-textarea{flex:1;resize:none;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;min-height:44px;max-height:120px;overflow-y:auto}
-.chat-textarea:focus{border-color:var(--primary)}
-.quick-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.quick-btn{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;background:rgba(79,70,229,.1);color:var(--primary);border:1px solid rgba(79,70,229,.2);cursor:pointer;transition:var(--trans)}
-.quick-btn:hover{background:var(--primary);color:#fff}
-.chat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-
-/* REMINDERS */
-.reminder-item{display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;background:#fff;box-shadow:var(--shadow-sm);margin-bottom:10px;transition:var(--trans)}
-.reminder-item.done{opacity:.55}
-.reminder-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.reminder-dot.future{background:var(--accent)}
-.reminder-dot.today{background:var(--warn)}
-.reminder-dot.past{background:var(--danger)}
-.reminder-info{flex:1}
-.reminder-date{font-size:12px;color:var(--text-muted);margin-bottom:2px}
-.reminder-desc{font-size:14px;font-weight:600}
-.reminder-amount{font-size:13px;color:var(--text-muted)}
-
-/* INFO PAGE */
-.info-section{margin-bottom:28px}
-.info-section h3{font-size:17px;font-weight:700;margin-bottom:12px;color:var(--text);padding-bottom:8px;border-bottom:2px solid var(--border)}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.info-item{padding:14px;background:#F9FAFB;border-radius:10px;border-left:3px solid var(--primary)}
-.info-item.plus{border-color:var(--accent)}
-.info-item.minus{border-color:var(--danger)}
-.info-item .label{font-size:12px;color:var(--text-muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.info-item p{font-size:14px;color:var(--text)}
-.steps{counter-reset:step}
-.step{display:flex;gap:12px;margin-bottom:14px}
-.step-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.step-text{padding-top:4px;font-size:14px}
-.faq-item{margin-bottom:10px}
-.faq-q{font-size:14px;font-weight:600;cursor:pointer;padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.faq-a{font-size:14px;color:var(--text-muted);padding:8px 0 4px;display:none}
-.faq-a.open{display:block}
-
-/* CALCULATOR */
-.calc-result{background:linear-gradient(135deg,#EEF2FF,#F5F3FF);border-radius:12px;padding:20px;margin-top:20px;border:1px solid rgba(79,70,229,.15)}
-.calc-result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:15px}
-.calc-result-row:last-child{border:none;font-weight:700;font-size:17px}
-.calc-result-row span:last-child{color:var(--primary)}
-.calc-warn{background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px;padding:12px 16px;font-size:13px;color:#92400E;margin-top:12px}
-
-/* QUICK ACTIONS */
-.quick-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
-.qa-btn{flex:1;min-width:140px;padding:16px;border-radius:12px;background:#fff;box-shadow:var(--shadow-sm);cursor:pointer;transition:var(--trans);border:none;text-align:center;font-family:inherit}
-.qa-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.qa-btn .icon{font-size:24px;margin-bottom:6px;display:block}
-.qa-btn .label{font-size:13px;font-weight:600;color:var(--text)}
-
-/* RECENT LIST */
-.recent-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
-.recent-item:last-child{border:none}
-.recent-icon{width:36px;height:36px;border-radius:8px;background:rgba(79,70,229,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.recent-info{flex:1}
-.recent-desc{font-size:14px;font-weight:500}
-.recent-date{font-size:12px;color:var(--text-muted)}
-.recent-amount{font-size:15px;font-weight:700;color:var(--primary)}
-
-/* BOTTOM NAV (mobile) */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);z-index:100;padding:8px 0 env(safe-area-inset-bottom)}
-.bottom-nav-inner{display:flex;justify-content:space-around}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;cursor:pointer;border-radius:8px;position:relative}
-.bnav-item .icon{font-size:20px}
-.bnav-item .label{font-size:10px;color:var(--text-muted);font-weight:500}
-.bnav-item.active .label{color:var(--primary)}
-.bnav-badge{position:absolute;top:2px;right:4px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
-
-/* TOGGLE ROW */
-.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.section-title{font-size:16px;font-weight:700}
-
-/* RESPONSIVE */
-@media(max-width:900px){
-  .grid-4{grid-template-columns:repeat(2,1fr)}
-  .info-grid{grid-template-columns:1fr}
-}
-@media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .main-content{margin-left:0;padding:16px;padding-bottom:80px}
-  .bottom-nav{display:block}
-  .grid-4{grid-template-columns:repeat(2,1fr)}
-  .grid-3{grid-template-columns:1fr 1fr}
-}
-@media(max-width:480px){
-  .grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
-  .page-header h2{font-size:20px}
-  .main-content{padding:12px;padding-bottom:80px}
-  .card{padding:14px}
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body { background: #f5f6fa; color: #2c3e50; min-height: 100vh; }
+  
+  /* Экран входа */
+  #login-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 9999; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; color: white;
+  }
+  #login-screen h2 { font-size: 32px; margin-bottom: 10px; }
+  #login-screen p { margin-bottom: 25px; opacity: 0.9; }
+  #login-screen input {
+    padding: 14px; margin: 6px; width: 300px; max-width: 90vw;
+    border: none; border-radius: 10px; font-size: 15px;
+    background: rgba(255,255,255,0.95);
+  }
+  #login-screen button {
+    padding: 14px 28px; margin: 6px; border: none; border-radius: 10px;
+    font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+  }
+  #login-screen button:hover { transform: translateY(-2px); }
+  .btn-login { background: #007bff; color: white; }
+  .btn-register { background: #28a745; color: white; }
+  
+  /* Хедер */
+  header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  header h1 { font-size: 24px; margin-bottom: 5px; }
+  header p { opacity: 0.9; font-size: 14px; }
+  .user-bar {
+    position: absolute; top: 15px; right: 20px; font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-bar button {
+    background: rgba(255,255,255,0.2); color: white; border: none;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  }
+  
+  /* Табы */
+  .tabs {
+    display: flex; background: white; overflow-x: auto;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .tab {
+    padding: 14px 20px; cursor: pointer; border: none; background: none;
+    font-size: 14px; color: #7f8c8d; white-space: nowrap; transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+  .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+  
+  /* Контент */
+  .content { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .card {
+    background: white; border-radius: 12px; padding: 20px;
+    margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .card h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; }
+  
+  /* Дашборд */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #667eea;
+  }
+  .stat-card .label { font-size: 13px; color: #7f8c8d; margin-bottom: 5px; }
+  .stat-card .value { font-size: 24px; font-weight: 700; color: #2c3e50; }
+  .stat-card .sub { font-size: 12px; color: #95a5a6; margin-top: 5px; }
+  
+  /* Таблица */
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+  th { background: #f8f9fa; font-weight: 600; color: #7f8c8d; font-size: 12px; text-transform: uppercase; }
+  tr:hover { background: #f8f9fa; }
+  
+  /* Кнопки */
+  .btn {
+    padding: 10px 18px; border: none; border-radius: 8px;
+    cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: #667eea; color: white; }
+  .btn-primary:hover { background: #5568d3; }
+  .btn-success { background: #28a745; color: white; }
+  .btn-danger { background: #e74c3c; color: white; }
+  .btn-secondary { background: #95a5a6; color: white; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  
+  /* Формы */
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #555; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
+    font-size: 14px; transition: border 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+  
+  /* Модальные окна */
+  .modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
+    background: white; border-radius: 12px; padding: 25px;
+    width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-content h3 { margin-bottom: 20px; }
+  
+  /* Тосты */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
+    border-radius: 8px; color: white; font-size: 14px; z-index: 2000;
+    animation: slideIn 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .toast.green { background: #28a745; }
+  .toast.red { background: #e74c3c; }
+  .toast.blue { background: #007bff; }
+  
+  /* Чат */
+  .chat-container { display: flex; flex-direction: column; height: 500px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; }
+  .msg { margin-bottom: 12px; padding: 10px 14px; border-radius: 12px; max-width: 80%; }
+  .msg.user { background: #667eea; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+  .msg.bot { background: white; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px; }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+  .quick-questions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .quick-questions button {
+    padding: 8px 14px; background: #f0f0f0; border: none; border-radius: 20px;
+    cursor: pointer; font-size: 13px;
+  }
+  .quick-questions button:hover { background: #e0e0e0; }
+  
+  /* Напоминания */
+  .reminder-item {
+    display: flex; align-items: center; padding: 12px; background: white;
+    border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #f39c12;
+  }
+  .reminder-item.done { opacity: 0.6; border-left-color: #28a745; }
+  .reminder-item.done .reminder-text { text-decoration: line-through; }
+  .reminder-text { flex: 1; }
+  .reminder-text .date { font-size: 12px; color: #95a5a6; }
+  
+  /* Пустое состояние */
+  .empty { text-align: center; padding: 40px 20px; color: #95a5a6; }
+  .empty .icon { font-size: 48px; margin-bottom: 10px; }
+  
+  /* Фильтры */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+  .filter-btn {
+    padding: 6px 12px; background: white; border: 1px solid #ddd;
+    border-radius: 20px; cursor: pointer; font-size: 13px;
+  }
+  .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+  
+  .error { color: #e74c3c; font-size: 12px; margin-top: 4px; }
+  
+  /* Информация */
+  .info-block { margin-bottom: 20px; }
+  .info-block h3 { margin-bottom: 10px; color: #667eea; }
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .pro, .con { padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+  .pro { background: #d4edda; }
+  .con { background: #f8d7da; }
+  
+  @media (max-width: 600px) {
+    .pros-cons { grid-template-columns: 1fr; }
+    .user-bar { position: static; margin-top: 10px; justify-content: center; }
+    header { padding-top: 15px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <h1>💼 Самозанятый</h1>
-      <p>Ваш финансовый помощник</p>
-    </div>
-    <div class="nav">
-      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>Дашборд</div>
-      <div class="nav-item" data-page="incomes"><span class="nav-icon">💰</span>Доходы</div>
-      <div class="nav-item" data-page="calculator"><span class="nav-icon">🧮</span>Калькулятор налога</div>
-      <div class="nav-item" data-page="ai"><span class="nav-icon">🤖</span>AI-помощник</div>
-      <div class="nav-item" data-page="info"><span class="nav-icon">ℹ️</span>Информация</div>
-      <div class="nav-item" data-page="reminders" id="nav-reminders"><span class="nav-icon">🔔</span>Напоминания</div>
-    </div>
-  </nav>
-
-  <!-- MAIN -->
-  <main class="main-content">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <h2>Дашборд</h2>
-        <p id="dash-subtitle">Текущий месяц</p>
-      </div>
-      <div class="grid grid-4 stat-cards" id="dash-stats"></div>
-      <div class="card chart-wrap" style="margin-bottom:24px">
-        <div class="section-title chart-title">Доходы за последние 6 месяцев</div>
-        <div class="chart-bars" id="chart-bars"></div>
-      </div>
-      <div class="quick-actions">
-        <button class="qa-btn" onclick="navigate('incomes')"><span class="icon">💰</span><span class="label">Добавить доход</span></button>
-        <button class="qa-btn" onclick="navigate('calculator')"><span class="icon">🧮</span><span class="label">Рассчитать налог</span></button>
-        <button class="qa-btn" onclick="navigate('ai')"><span class="icon">🤖</span><span class="label">Задать вопрос AI</span></button>
-      </div>
-      <div class="card">
-        <div class="section-header"><span class="section-title">Последние доходы</span></div>
-        <div id="recent-list"></div>
-      </div>
-    </div>
-
-    <!-- INCOMES -->
-    <div class="page" id="page-incomes">
-      <div class="page-header page-header-row">
-        <div>
-          <h2>Доходы</h2>
-          <p>Учёт всех поступлений</p>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📥 Экспорт CSV</button>
-          <button class="btn btn-primary btn-sm" onclick="openIncomeModal()">+ Добавить</button>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <div class="filters">
-          <select class="filter-select" id="filter-period" onchange="renderIncomes()">
-            <option value="all">Все время</option>
-            <option value="month" selected>Этот месяц</option>
-            <option value="quarter">Квартал</option>
-            <option value="year">Этот год</option>
-          </select>
-          <select class="filter-select" id="filter-type" onchange="renderIncomes()">
-            <option value="all">Все клиенты</option>
-            <option value="individual">Физлица</option>
-            <option value="legal">Юрлица</option>
-          </select>
-          <span class="filters-total" id="filter-total">Итого: 0 ₽</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Дата</th><th>Описание</th><th>Сумма</th><th>Клиент</th><th>Налог</th><th></th></tr></thead>
-            <tbody id="incomes-tbody"></tbody>
-          </table>
-        </div>
-        <div id="incomes-empty" class="empty-state" style="display:none">
-          <div class="icon">💸</div>
-          <h3>Пока нет доходов</h3>
-          <p>Добавьте первый доход, чтобы начать учёт</p>
-          <button class="btn btn-primary" onclick="openIncomeModal()">+ Добавить первый</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CALCULATOR -->
-    <div class="page" id="page-calculator">
-      <div class="page-header"><h2>Калькулятор налога</h2><p>НПД: 4% или 6%</p></div>
-      <div class="grid grid-2" style="gap:20px;align-items:start">
-        <div class="card">
-          <div class="section-title" style="margin-bottom:16px">Расчёт налога</div>
-          <div class="form-group">
-            <label class="form-label">Сумма дохода (₽)</label>
-            <input type="number" class="form-control" id="calc-amount" placeholder="15 000" min="0">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ставка налога</label>
-            <select class="form-control" id="calc-rate">
-              <option value="4">4% — физические лица</option>
-              <option value="6">6% — юридические лица</option>
-              <option value="auto">Авто (из реальных доходов)</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" style="width:100%" onclick="calcTax()">Рассчитать</button>
-          <div id="calc-result" style="display:none" class="calc-result">
-            <div class="calc-result-row"><span>Сумма дохода</span><span id="cr-income">—</span></div>
-            <div class="calc-result-row"><span>Ставка</span><span id="cr-rate">—</span></div>
-            <div class="calc-result-row"><span>Налог</span><span id="cr-tax">—</span></div>
-            <div class="calc-result-row"><span>Чистый доход</span><span id="cr-net">—</span></div>
-          </div>
-          <div id="calc-warn" class="calc-warn" style="display:none">⚠️ Внимание: доход превышает лимит 2 400 000 ₽. Требуется переход на другой налоговый режим.</div>
-          <button id="btn-gen-receipt" class="btn btn-accent" style="width:100%;margin-top:12px;display:none" onclick="generateReceipt()">🧾 Сформировать чек</button>
-        </div>
-        <div class="card">
-          <div class="section-title" style="margin-bottom:16px">Лимит самозанятого</div>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Максимальный доход: <strong>2 400 000 ₽/год</strong></p>
-          <div id="limit-bar"></div>
-          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-            <div class="section-title" style="margin-bottom:12px;font-size:14px">Итого за год</div>
-            <div id="year-stats"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AI -->
-    <div class="page" id="page-ai">
-      <div class="page-header page-header-row">
-        <div><h2>AI-помощник</h2><p>Вопросы по самозанятости</p></div>
-        <button class="btn btn-ghost btn-sm" onclick="openApiModal()">⚙️ Настройки API</button>
-      </div>
-      <div class="card chat-wrap">
-        <div class="chat-header">
-          <span style="font-size:14px;font-weight:600">Чат</span>
-          <button class="btn btn-ghost btn-sm" onclick="clearChat()">🗑 Очистить</button>
-        </div>
-        <div class="quick-btns">
-          <button class="quick-btn" onclick="sendQuick('Как зарегистрироваться в качестве самозанятого?')">Как зарегистрироваться?</button>
-          <button class="quick-btn" onclick="sendQuick('Какой налог я плачу как самозанятый?')">Какой налог я плачу?</button>
-          <button class="quick-btn" onclick="sendQuick('Какие ограничения у самозанятых?')">Какие ограничения?</button>
-          <button class="quick-btn" onclick="sendQuick('Нужна ли мне онлайн-касса?')">Нужна ли касса?</button>
-        </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input-wrap">
-          <textarea class="chat-textarea" id="chat-input" placeholder="Задайте вопрос о самозанятости..." rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
-          <button class="btn btn-primary" id="chat-send" onclick="sendChat()">Отправить</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- INFO -->
-    <div class="page" id="page-info">
-      <div class="page-header"><h2>Информация</h2><p>Всё о самозанятости в России</p></div>
-      <div class="card" style="margin-bottom:16px">
-        <div class="info-section">
-          <h3>Что такое самозанятость?</h3>
-          <p style="font-size:14px;color:var(--text-muted);line-height:1.65">Самозанятость (НПД — налог на профессиональный доход) — специальный налоговый режим для тех, кто работает на себя. Действует с 2019 года, позволяет легально получать доход и платить минимальный налог без бухгалтера, отчётности и онлайн-кассы.</p>
-        </div>
-        <div class="info-section">
-          <h3>Преимущества и недостатки</h3>
-          <div class="info-grid">
-            <div class="info-item plus"><div class="label">✅ Плюс</div><p>Низкий налог: 4% или 6%</p></div>
-            <div class="info-item minus"><div class="label">❌ Минус</div><p>Лимит дохода: 2.4 млн ₽/год</p></div>
-            <div class="info-item plus"><div class="label">✅ Плюс</div><p>Регистрация за 5 минут в приложении</p></div>
-            <div class="info-item minus"><div class="label">❌ Минус</div><p>Нельзя нанимать сотрудников</p></div>
-            <div class="info-item plus"><div class="label">✅ Плюс</div><p>Нет деклараций и отчётности</p></div>
-            <div class="info-item minus"><div class="label">❌ Минус</div><p>Ограничения по видам деятельности</p></div>
-            <div class="info-item plus"><div class="label">✅ Плюс</div><p>Всё онлайн: чеки, налоги, регистрация</p></div>
-            <div class="info-item minus"><div class="label">❌ Минус</div><p>Нельзя перепродавать товары</p></div>
-          </div>
-        </div>
-        <div class="info-section">
-          <h3>Как зарегистрироваться</h3>
-          <div class="step"><div class="step-num">1</div><div class="step-text">Скачайте приложение <strong>«Мой налог»</strong> (App Store / Google Play)</div></div>
-          <div class="step"><div class="step-num">2</div><div class="step-text">Зарегистрируйтесь по паспорту — займёт около 5 минут</div></div>
-          <div class="step"><div class="step-num">3</div><div class="step-text">Выберите виды деятельности (можно несколько)</div></div>
-          <div class="step"><div class="step-num">4</div><div class="step-text">Начните работать и выдавать чеки клиентам через приложение</div></div>
-        </div>
-        <div class="info-section">
-          <h3>Частые вопросы</h3>
-          <div id="faq-list"></div>
-        </div>
-        <div class="info-section" style="margin-bottom:0">
-          <h3>Полезные ссылки</h3>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="https://nalog.ru" target="_blank" class="btn btn-ghost btn-sm">🏛 nalog.ru — ФНС России</a>
-            <a href="https://apps.apple.com/ru/app/мой-налог/id1372678170" target="_blank" class="btn btn-ghost btn-sm">📱 App Store — Мой налог</a>
-            <a href="https://play.google.com/store/apps/details?id=com.gnivts.selfemployed" target="_blank" class="btn btn-ghost btn-sm">📱 Google Play — Мой налог</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- REMINDERS -->
-    <div class="page" id="page-reminders">
-      <div class="page-header page-header-row">
-        <div><h2>Напоминания</h2><p>Налоги и платежи</p></div>
-        <button class="btn btn-primary btn-sm" onclick="openReminderModal()">+ Добавить</button>
-      </div>
-      <div id="reminders-list"></div>
-      <div id="reminders-empty" class="empty-state" style="display:none">
-        <div class="icon">🔔</div>
-        <h3>Нет напоминаний</h3>
-        <p>Добавьте напоминание о налоговых платежах</p>
-        <button class="btn btn-primary" onclick="openReminderModal()">+ Добавить первое</button>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <div class="bnav-item active" data-page="dashboard"><span class="icon">📊</span><span class="label">Дашборд</span></div>
-    <div class="bnav-item" data-page="incomes"><span class="icon">💰</span><span class="label">Доходы</span></div>
-    <div class="bnav-item" data-page="calculator"><span class="icon">🧮</span><span class="label">Налог</span></div>
-    <div class="bnav-item" data-page="ai"><span class="icon">🤖</span><span class="label">AI</span></div>
-    <div class="bnav-item" data-page="reminders" id="bnav-reminders"><span class="icon">🔔</span><span class="label">Напоминания</span></div>
+<!-- ЭКРАН ВХОДА -->
+<div id="login-screen">
+  <h2>💼 Помощник самозанятого</h2>
+  <p>Войдите или зарегистрируйтесь для доступа к данным</p>
+  <input type="email" id="login-email" placeholder="Ваш Email">
+  <input type="password" id="login-pass" placeholder="Пароль">
+  <div style="margin-top: 15px;">
+    <button class="btn-login" onclick="doLogin()">Войти</button>
+    <button class="btn-register" onclick="doRegister()">Регистрация</button>
   </div>
 </div>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toasts"></div>
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<div id="app-content" style="display:none;">
 
-<!-- INCOME MODAL -->
-<div class="modal-overlay" id="income-modal">
-  <div class="modal">
-    <h3 id="income-modal-title">Добавить доход</h3>
-    <input type="hidden" id="income-edit-id">
+<header style="position: relative;">
+  <h1>💼 Самозанятый</h1>
+  <p>Ваш финансовый помощник</p>
+  <div class="user-bar">
+    <span id="user-email-display"></span>
+    <button onclick="doLogout()">Выйти</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-tab="dashboard">📊 Дашборд</button>
+  <button class="tab" data-tab="incomes">💰 Доходы</button>
+  <button class="tab" data-tab="calculator">🧮 Калькулятор</button>
+  <button class="tab" data-tab="chat">🤖 AI-помощник</button>
+  <button class="tab" data-tab="info">ℹ️ Информация</button>
+  <button class="tab" data-tab="reminders">🔔 Напоминания</button>
+</div>
+
+<div class="content">
+
+  <!-- ДАШБОРД -->
+  <div class="section active" id="dashboard">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Доход за месяц</div>
+        <div class="value" id="stat-month-total">0 ₽</div>
+        <div class="sub" id="stat-month-count">0 операций</div>
+      </div>
+      <div class="stat-card" style="border-left-color: #e74c3c;">
+        <div class="label">Налог за месяц</div>
+        <div class="value" id="stat-month-tax">0 ₽</div>
+        <div class="sub">К уплате</div>
+      </div>
+      <div class="stat-card" style="border-left-color: #28a745;">
+        <div class="label">Чистый доход</div>
+        <div class="value" id="stat-month-net">0 ₽</div>
+        <div class="sub">За месяц</div>
+      </div>
+      <div class="stat-card" style="border-left-color: #f39c12;">
+        <div class="label">Доход за год</div>
+        <div class="value" id="stat-year-total">0 ₽</div>
+        <div class="sub" id="stat-year-limit">Остаток лимита: 2 400 000 ₽</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Быстрые действия</h2>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="openModal('income-modal')">💰 Добавить доход</button>
+        <button class="btn btn-success" onclick="switchTab('calculator')">🧮 Рассчитать налог</button>
+        <button class="btn btn-secondary" onclick="switchTab('chat')">🤖 Задать вопрос AI</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Последние доходы</h2>
+      <div id="dashboard-recent"></div>
+    </div>
+  </div>
+
+  <!-- ДОХОДЫ -->
+  <div class="section" id="incomes">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin: 0;">💰 Доходы</h2>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Экспорт CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('income-modal')">+ Добавить</button>
+        </div>
+      </div>
+      
+      <div class="filters">
+        <button class="filter-btn active" data-filter-period="all">Все</button>
+        <button class="filter-btn" data-filter-period="month">Этот месяц</button>
+        <button class="filter-btn" data-filter-period="quarter">Квартал</button>
+        <button class="filter-btn" data-filter-period="year">Этот год</button>
+        <button class="filter-btn active" data-filter-client="all">Все клиенты</button>
+        <button class="filter-btn" data-filter-client="individual">Физлица</button>
+        <button class="filter-btn" data-filter-client="legal">Юрлица</button>
+      </div>
+      
+      <div style="margin-bottom: 10px; font-size: 14px; color: #7f8c8d;">
+        Итого: <strong id="incomes-total" style="color: #2c3e50;">0 ₽</strong>
+      </div>
+      
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr><th>Дата</th><th>Описание</th><th>Сумма</th><th>Клиент</th><th>Налог</th><th></th></tr>
+          </thead>
+          <tbody id="incomes-tbody"></tbody>
+        </table>
+      </div>
+      <div id="incomes-empty" class="empty" style="display:none;">
+        <div class="icon">💸</div>
+        <p>Пока нет доходов</p>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="openModal('income-modal')">+ Добавить первый</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- КАЛЬКУЛЯТОР -->
+  <div class="section" id="calculator">
+    <div class="card">
+      <h2>🧮 Калькулятор налога</h2>
+      <p style="color: #7f8c8d; margin-bottom: 15px;">НПД: 4% или 6%</p>
+      
+      <div class="form-group">
+        <label>Сумма дохода (₽)</label>
+        <input type="number" id="calc-amount" placeholder="100000">
+      </div>
+      <div class="form-group">
+        <label>Ставка налога</label>
+        <select id="calc-rate">
+          <option value="4">4% — физические лица</option>
+          <option value="6">6% — юридические лица</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="calculateTax()">Рассчитать</button>
+      
+      <div id="calc-result" style="margin-top: 20px; display:none;">
+        <div class="stat-card">
+          <div class="label">Сумма дохода</div>
+          <div class="value" id="calc-r-amount">—</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+          <div class="stat-card" style="border-left-color: #e74c3c;">
+            <div class="label">Ставка / Налог</div>
+            <div class="value" id="calc-r-tax">—</div>
+          </div>
+          <div class="stat-card" style="border-left-color: #28a745;">
+            <div class="label">Чистый доход</div>
+            <div class="value" id="calc-r-net">—</div>
+          </div>
+        </div>
+        <div id="calc-limit-warning" style="display:none; margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #f39c12; border-radius: 6px;">
+          ⚠️ <strong>Внимание:</strong> доход превышает лимит 2 400 000 ₽. Требуется переход на другой налоговый режим.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ЧАТ -->
+  <div class="section" id="chat">
+    <div class="card">
+      <h2>🤖 AI-помощник</h2>
+      <p style="color: #7f8c8d; margin-bottom: 15px;">Вопросы по самозанятости</p>
+      
+      <div class="quick-questions">
+        <button onclick="askQuick('Как зарегистрироваться?')">Как зарегистрироваться?</button>
+        <button onclick="askQuick('Какой налог я плачу?')">Какой налог я плачу?</button>
+        <button onclick="askQuick('Какие ограничения?')">Какие ограничения?</button>
+        <button onclick="askQuick('Нужна ли касса?')">Нужна ли касса?</button>
+      </div>
+      
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Задайте вопрос..." onkeypress="if(event.key==='Enter') sendChat()">
+          <button class="btn btn-primary" onclick="sendChat()">Отправить</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearChat()">🗑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ИНФОРМАЦИЯ -->
+  <div class="section" id="info">
+    <div class="card">
+      <h2>ℹ️ Всё о самозанятости в России</h2>
+      
+      <div class="info-block">
+        <h3>Что такое самозанятость?</h3>
+        <p>Самозанятость (НПД — налог на профессиональный доход) — специальный налоговый режим для тех, кто работает на себя. Действует с 2019 года, позволяет легально получать доход и платить минимальный налог без бухгалтера, отчётности и онлайн-кассы.</p>
+      </div>
+      
+      <div class="info-block">
+        <h3>Преимущества и недостатки</h3>
+        <div class="pros-cons">
+          <div>
+            <div class="pro">✅ Низкий налог: 4% или 6%</div>
+            <div class="pro">✅ Регистрация за 5 минут в приложении</div>
+            <div class="pro">✅ Нет деклараций и отчётности</div>
+            <div class="pro">✅ Всё онлайн: чеки, налоги, регистрация</div>
+          </div>
+          <div>
+            <div class="con">❌ Лимит дохода: 2.4 млн ₽/год</div>
+            <div class="con">❌ Нельзя нанимать сотрудников</div>
+            <div class="con">❌ Ограничения по видам деятельности</div>
+            <div class="con">❌ Нельзя перепродавать товары</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-block">
+        <h3>Как зарегистрироваться</h3>
+        <ol style="padding-left: 20px; line-height: 1.8;">
+          <li>Скачайте приложение «Мой налог»</li>
+          <li>Зарегистрируйтесь по паспорту — займёт около 5 минут</li>
+          <li>Выберите виды деятельности (можно несколько)</li>
+          <li>Начните работать и выдавать чеки клиентам через приложение</li>
+        </ol>
+      </div>
+      
+      <div class="info-block">
+        <h3>Полезные ссылки</h3>
+        <p><a href="https://nalog.ru" target="_blank">🏛 nalog.ru — ФНС России</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- НАПОМИНАНИЯ -->
+  <div class="section" id="reminders">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2 style="margin: 0;">🔔 Напоминания</h2>
+        <button class="btn btn-primary btn-sm" onclick="openModal('reminder-modal')">+ Добавить</button>
+      </div>
+      <div id="reminders-list"></div>
+      <div id="reminders-empty" class="empty" style="display:none;">
+        <div class="icon">🔔</div>
+        <p>Нет напоминаний</p>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="openModal('reminder-modal')">+ Добавить первое</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- МОДАЛКИ -->
+<div class="modal" id="income-modal">
+  <div class="modal-content">
+    <h3>Добавить доход</h3>
     <div class="form-group">
-      <label class="form-label">Описание услуги *</label>
-      <input type="text" class="form-control" id="f-desc" placeholder="Разработка сайта">
-      <div class="form-error" id="e-desc">Минимум 5 символов</div>
+      <label>Описание услуги *</label>
+      <input type="text" id="f-desc" placeholder="Например: Дизайн логотипа">
+      <div class="error" id="err-desc" style="display:none;">Минимум 5 символов</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Сумма (₽) *</label>
-      <input type="number" class="form-control" id="f-amount" placeholder="15000" min="1">
-      <div class="form-error" id="e-amount">Введите сумму больше 0</div>
+      <label>Сумма (₽) *</label>
+      <input type="number" id="f-amount" placeholder="50000">
+      <div class="error" id="err-amount" style="display:none;">Введите сумму больше 0</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Дата</label>
-      <input type="date" class="form-control" id="f-date">
+      <label>Дата</label>
+      <input type="date" id="f-date">
     </div>
     <div class="form-group">
-      <label class="form-label">Тип клиента</label>
-      <select class="form-control" id="f-type">
+      <label>Тип клиента</label>
+      <select id="f-type">
         <option value="individual">Физическое лицо (4%)</option>
         <option value="legal">Юридическое лицо (6%)</option>
       </select>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('income-modal')">Отмена</button>
-      <button class="btn btn-primary" id="income-submit" onclick="submitIncome()">Сохранить</button>
+    <input type="hidden" id="income-edit-id" value="">
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal('income-modal')">Отмена</button>
+      <button class="btn btn-primary" onclick="submitIncome()">Сохранить</button>
     </div>
   </div>
 </div>
 
-<!-- REMINDER MODAL -->
-<div class="modal-overlay" id="reminder-modal">
-  <div class="modal">
+<div class="modal" id="reminder-modal">
+  <div class="modal-content">
     <h3>Добавить напоминание</h3>
     <div class="form-group">
-      <label class="form-label">Дата платежа *</label>
-      <input type="date" class="form-control" id="r-date">
-      <div class="form-error" id="e-r-date">Укажите дату</div>
+      <label>Дата платежа *</label>
+      <input type="date" id="r-date">
     </div>
     <div class="form-group">
-      <label class="form-label">Сумма (₽) *</label>
-      <input type="number" class="form-control" id="r-amount" placeholder="5000">
-      <div class="form-error" id="e-r-amount">Введите сумму</div>
+      <label>Сумма (₽) *</label>
+      <input type="number" id="r-amount" placeholder="5000">
     </div>
     <div class="form-group">
-      <label class="form-label">Описание *</label>
-      <input type="text" class="form-control" id="r-desc" placeholder="Налог за январь">
-      <div class="form-error" id="e-r-desc">Обязательное поле</div>
+      <label>Описание *</label>
+      <input type="text" id="r-desc" placeholder="Налог за квартал">
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('reminder-modal')">Отмена</button>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal('reminder-modal')">Отмена</button>
       <button class="btn btn-primary" onclick="submitReminder()">Добавить</button>
     </div>
   </div>
 </div>
 
-<!-- API MODAL -->
-<div class="modal-overlay" id="api-modal">
-  <div class="modal">
-    <h3>⚙️ Настройки YandexGPT API</h3>
-    <div class="form-group">
-      <label class="form-label">API ключ</label>
-      <input type="password" class="form-control" id="api-key" placeholder="AQVN...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Folder ID</label>
-      <input type="text" class="form-control" id="api-folder" placeholder="b1g...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">URL прокси (необязательно)</label>
-      <input type="text" class="form-control" id="api-proxy" placeholder="https://your-proxy.com/api">
-    </div>
-    <div id="api-status" style="font-size:13px;margin-bottom:8px"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="testApi()">Проверить</button>
-      <button class="btn btn-ghost" onclick="closeModal('api-modal')">Отмена</button>
-      <button class="btn btn-primary" onclick="saveApiSettings()">Сохранить</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM MODAL -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal">
+<div class="modal" id="confirm-modal">
+  <div class="modal-content">
     <h3>Подтверждение</h3>
-    <p id="confirm-text" style="font-size:14px;color:var(--text-muted);margin-bottom:16px"></p>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('confirm-modal')">Отмена</button>
-      <button class="btn btn-danger" id="confirm-ok">Удалить</button>
+    <p id="confirm-text">Вы уверены?</p>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+      <button class="btn btn-secondary" onclick="closeModal('confirm-modal')">Отмена</button>
+      <button class="btn btn-danger" id="confirm-btn">Удалить</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============ STORAGE ============
-const S = {
-  get: (k, def=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? def } catch { return def } },
-  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-  raw: (k, def='') => localStorage.getItem(k) ?? def,
-  setRaw: (k, v) => localStorage.setItem(k, v)
-};
+// ============ НАСТРОЙКИ ============
+const API_URL = 'https://katrtrtrtrtrtrtr-self-employed-helper.hf.space';
+let authToken = localStorage.getItem('authToken');
+let userEmail = localStorage.getItem('userEmail');
 
-// ============ STATE ============
-let incomes = S.get('incomes', []);
-let reminders = S.get('reminders', []);
-let chatHistory = S.get('chatHistory', []);
-let currentPage = 'dashboard';
+let incomes = [];
+let reminders = [];
+let chatHistory = [];
+let filterPeriod = 'all';
+let filterClient = 'all';
 
-// ============ UTILS ============
-const fmt = n => new Intl.NumberFormat('ru-RU').format(Math.round(n));
-const fmtDate = d => new Date(d).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric'});
-const today = () => new Date().toISOString().slice(0,10);
-const nowMonthYear = () => { const d=new Date(); return {m:d.getMonth(), y:d.getFullYear()} };
-
-function monthName(offset=0) {
-  const d = new Date();
-  d.setMonth(d.getMonth() - offset);
-  return d.toLocaleDateString('ru-RU', {month:'short'});
+// ============ АВТОРИЗАЦИЯ ============
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { toast('Заполните все поля', 'red'); return; }
+  
+  try {
+    const res = await fetch(`${API_URL}/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`, { method: 'POST' });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Ошибка входа'); }
+    const data = await res.json();
+    authToken = data.access_token;
+    userEmail = email;
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('userEmail', email);
+    showApp();
+    toast('Добро пожаловать!', 'green');
+  } catch (e) { toast(e.message, 'red'); }
 }
 
-// ============ NAVIGATION ============
-function navigate(page) {
-  currentPage = page;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page===page));
-  document.querySelectorAll('.bnav-item').forEach(n => n.classList.toggle('active', n.dataset.page===page));
-
-  if (page==='dashboard') renderDashboard();
-  if (page==='incomes') renderIncomes();
-  if (page==='calculator') renderLimitBar();
-  if (page==='reminders') renderReminders();
-  if (page==='ai') renderChat();
-  if (page==='info') renderFAQ();
+async function doRegister() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { toast('Заполните все поля', 'red'); return; }
+  if (pass.length < 4) { toast('Пароль минимум 4 символа', 'red'); return; }
+  
+  try {
+    const res = await fetch(`${API_URL}/register`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, password: pass })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Ошибка регистрации'); }
+    const data = await res.json();
+    authToken = data.access_token;
+    userEmail = email;
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('userEmail', email);
+    showApp();
+    toast('Регистрация успешна!', 'green');
+  } catch (e) { toast(e.message, 'red'); }
 }
 
-document.querySelectorAll('.nav-item, .bnav-item').forEach(el => {
-  el.addEventListener('click', () => navigate(el.dataset.page));
-});
-
-// ============ DASHBOARD ============
-function renderDashboard() {
-  const {m,y} = nowMonthYear();
-  const monthIncomes = incomes.filter(i => {
-    const d = new Date(i.date);
-    return d.getMonth()===m && d.getFullYear()===y;
-  });
-  const total = monthIncomes.reduce((s,i) => s+i.amount, 0);
-  const tax = monthIncomes.reduce((s,i) => s+(i.amount * i.taxRate/100), 0);
-  const net = total - tax;
-  const count = monthIncomes.length;
-
-  document.getElementById('dash-subtitle').textContent =
-    new Date().toLocaleDateString('ru-RU', {month:'long', year:'numeric'});
-
-  document.getElementById('dash-stats').innerHTML = `
-    <div class="card stat-card">
-      <div class="card-title">Доход за месяц</div>
-      <div class="card-value">${fmt(total)} ₽</div>
-      <div class="card-sub">${count} поступлений</div>
-    </div>
-    <div class="card stat-card yellow">
-      <div class="card-title">Налог к уплате</div>
-      <div class="card-value">${fmt(tax)} ₽</div>
-      <div class="card-sub">НПД ${total>0 ? Math.round(tax/total*100) : 0}%</div>
-    </div>
-    <div class="card stat-card green">
-      <div class="card-title">Чистый доход</div>
-      <div class="card-value">${fmt(net)} ₽</div>
-      <div class="card-sub">После налогов</div>
-    </div>
-    <div class="card stat-card purple">
-      <div class="card-title">Всего за год</div>
-      <div class="card-value">${fmt(incomes.filter(i=>new Date(i.date).getFullYear()===y).reduce((s,i)=>s+i.amount,0))} ₽</div>
-      <div class="card-sub">Текущий год</div>
-    </div>
-  `;
-
-  renderChart();
-  renderRecentList();
+function doLogout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userEmail');
+  location.reload();
 }
 
-function renderChart() {
-  const bars = document.getElementById('chart-bars');
-  const months = [];
-  for (let i=5;i>=0;i--) {
-    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
-    const m=d.getMonth(), y=d.getFullYear();
-    const total = incomes.filter(inc => {
-      const id=new Date(inc.date); return id.getMonth()===m && id.getFullYear()===y;
-    }).reduce((s,inc)=>s+inc.amount,0);
-    months.push({label:monthName(i), total, m, y});
+// ============ API ЗАПРОСЫ ============
+async function api(endpoint, method = 'GET', body = null) {
+  const headers = { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' };
+  const res = await fetch(`${API_URL}${endpoint}`, { method, headers, body: body ? JSON.stringify(body) : null });
+  if (res.status === 401) { doLogout(); throw new Error('Сессия истекла'); }
+  if (!res.ok) {
+    let msg = 'Ошибка';
+    try { const e = await res.json(); msg = e.detail || msg; } catch(e){}
+    throw new Error(msg);
   }
-  const max = Math.max(...months.map(m=>m.total), 1);
-  bars.innerHTML = months.map(mo => `
-    <div class="chart-bar-wrap">
-      <div class="chart-amount">${mo.total>0?fmt(mo.total)+' ₽':''}</div>
-      <div class="chart-bar" style="height:${Math.max(mo.total/max*110,2)}px" title="${fmt(mo.total)} ₽"></div>
-      <span class="chart-label" style="position:static">${mo.label}</span>
-    </div>
-  `).join('');
+  return res;
 }
 
-function renderRecentList() {
-  const sorted = [...incomes].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
-  const el = document.getElementById('recent-list');
-  if (!sorted.length) { el.innerHTML='<div class="empty-state"><div class="icon">💸</div><h3>Нет доходов</h3><p>Добавьте первый доход</p></div>'; return; }
-  el.innerHTML = sorted.map(i=>`
-    <div class="recent-item">
-      <div class="recent-icon">💼</div>
-      <div class="recent-info">
-        <div class="recent-desc">${i.description}</div>
-        <div class="recent-date">${fmtDate(i.date)} · ${i.clientType==='individual'?'Физлицо':'Юрлицо'}</div>
-      </div>
-      <div class="recent-amount">+${fmt(i.amount)} ₽</div>
-      <button class="btn btn-ghost btn-sm" onclick="confirmDelete('income',${i.id})" style="margin-left:8px">🗑</button>
-    </div>
-  `).join('');
+// ============ ЗАГРУЗКА ДАННЫХ ============
+async function loadIncomes() {
+  try {
+    const res = await api(`/incomes?period=${filterPeriod}&client_type=${filterClient}`);
+    incomes = await res.json();
+    renderIncomes();
+    renderDashboard();
+  } catch (e) { console.error(e); }
 }
 
-// ============ INCOMES ============
-function getFilteredIncomes() {
-  const period = document.getElementById('filter-period')?.value || 'all';
-  const type = document.getElementById('filter-type')?.value || 'all';
-  const now = new Date();
-  return incomes.filter(i => {
-    const d = new Date(i.date);
-    let ok = true;
-    if (period==='month') ok = d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
-    else if (period==='quarter') {
-      const q = Math.floor(now.getMonth()/3);
-      ok = Math.floor(d.getMonth()/3)===q && d.getFullYear()===now.getFullYear();
-    } else if (period==='year') ok = d.getFullYear()===now.getFullYear();
-    if (type!=='all') ok = ok && i.clientType===type;
-    return ok;
+async function loadReminders() {
+  try {
+    const res = await api('/reminders');
+    reminders = await res.json();
+    renderReminders();
+  } catch (e) { console.error(e); }
+}
+
+async function loadStats() {
+  try {
+    const res = await api('/stats/summary');
+    const s = await res.json();
+    document.getElementById('stat-month-total').textContent = fmt(s.month_total) + ' ₽';
+    document.getElementById('stat-month-tax').textContent = fmt(s.month_tax) + ' ₽';
+    document.getElementById('stat-month-net').textContent = fmt(s.month_net) + ' ₽';
+    document.getElementById('stat-month-count').textContent = s.month_count + ' операций';
+    document.getElementById('stat-year-total').textContent = fmt(s.year_total) + ' ₽';
+    document.getElementById('stat-year-limit').textContent = 'Остаток лимита: ' + fmt(s.year_limit_remaining) + ' ₽';
+  } catch (e) { console.error(e); }
+}
+
+async function loadChatHistory() {
+  try {
+    const res = await api('/chat/history');
+    chatHistory = await res.json();
+    renderChatHistory();
+  } catch (e) { console.error(e); }
+}
+
+// ============ ДОХОДЫ ============
+async function submitIncome() {
+  const desc = document.getElementById('f-desc').value.trim();
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const date = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
+  const type = document.getElementById('f-type').value;
+  
+  let valid = true;
+  if (desc.length < 5) { document.getElementById('err-desc').style.display = 'block'; valid = false; }
+  else document.getElementById('err-desc').style.display = 'none';
+  if (!amount || amount <= 0) { document.getElementById('err-amount').style.display = 'block'; valid = false; }
+  else document.getElementById('err-amount').style.display = 'none';
+  if (!valid) return;
+  
+  try {
+    await api('/incomes', 'POST', { date, description: desc, amount, client_type: type });
+    toast('Доход добавлен', 'green');
+    closeModal('income-modal');
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-amount').value = '';
+    await loadIncomes();
+    await loadStats();
+  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
+}
+
+async function deleteIncome(id) {
+  showConfirm('Удалить этот доход?', async () => {
+    try {
+      await api(`/incomes/${id}`, 'DELETE');
+      toast('Удалено', 'green');
+      await loadIncomes();
+      await loadStats();
+    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
   });
 }
 
 function renderIncomes() {
-  const filtered = getFilteredIncomes();
   const tbody = document.getElementById('incomes-tbody');
   const empty = document.getElementById('incomes-empty');
-  const totalEl = document.getElementById('filter-total');
-  const total = filtered.reduce((s,i)=>s+i.amount,0);
-  totalEl.textContent = `Итого: ${fmt(total)} ₽`;
-
-  if (!filtered.length) {
-    tbody.innerHTML=''; empty.style.display='block'; return;
+  
+  if (incomes.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('incomes-total').textContent = '0 ₽';
+    return;
   }
-  empty.style.display='none';
-  const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  tbody.innerHTML = sorted.map(i=>`
-    <tr>
-      <td>${fmtDate(i.date)}</td>
-      <td>${i.description}</td>
+  empty.style.display = 'none';
+  
+  let total = 0;
+  tbody.innerHTML = incomes.map(i => {
+    const tax = i.amount * i.tax_rate / 100;
+    total += i.amount;
+    const clientLabel = i.client_type === 'individual' ? 'Физлицо' : 'Юрлицо';
+    return `<tr>
+      <td>${i.date}</td>
+      <td>${escapeHtml(i.description)}</td>
       <td><strong>${fmt(i.amount)} ₽</strong></td>
-      <td><span class="badge ${i.clientType==='individual'?'badge-blue':'badge-purple'}">${i.clientType==='individual'?'Физлицо':'Юрлицо'}</span></td>
-      <td>${fmt(i.amount*i.taxRate/100)} ₽ (${i.taxRate}%)</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-sm" onclick="editIncome(${i.id})">✏️</button>
-        <button class="btn btn-ghost btn-sm" onclick="confirmDelete('income',${i.id})" style="margin-left:4px">🗑</button>
-      </td>
-    </tr>
+      <td>${clientLabel} (${i.tax_rate}%)</td>
+      <td>${fmt(tax)} ₽</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteIncome(${i.id})">×</button></td>
+    </tr>`;
+  }).join('');
+  
+  document.getElementById('incomes-total').textContent = fmt(total) + ' ₽';
+}
+
+function renderDashboard() {
+  const recent = incomes.slice(0, 5);
+  const el = document.getElementById('dashboard-recent');
+  if (recent.length === 0) {
+    el.innerHTML = '<p style="color:#95a5a6; text-align:center; padding:20px;">Нет доходов</p>';
+    return;
+  }
+  el.innerHTML = '<table style="width:100%;">' + recent.map(i => `
+    <tr><td>${i.date}</td><td>${escapeHtml(i.description)}</td><td style="text-align:right;"><strong>${fmt(i.amount)} ₽</strong></td></tr>
+  `).join('') + '</table>';
+}
+
+// ============ НАПОМИНАНИЯ ============
+async function submitReminder() {
+  const date = document.getElementById('r-date').value;
+  const amount = parseFloat(document.getElementById('r-amount').value);
+  const desc = document.getElementById('r-desc').value.trim();
+  
+  if (!date || !amount || !desc) { toast('Заполните все поля', 'red'); return; }
+  
+  try {
+    await api('/reminders', 'POST', { date, amount, description: desc });
+    toast('Напоминание добавлено', 'green');
+    closeModal('reminder-modal');
+    document.getElementById('r-date').value = '';
+    document.getElementById('r-amount').value = '';
+    document.getElementById('r-desc').value = '';
+    await loadReminders();
+  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
+}
+
+async function toggleReminder(id) {
+  try {
+    await api(`/reminders/${id}/toggle`, 'PATCH');
+    await loadReminders();
+  } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
+}
+
+async function deleteReminder(id) {
+  showConfirm('Удалить напоминание?', async () => {
+    try {
+      await api(`/reminders/${id}`, 'DELETE');
+      toast('Удалено', 'green');
+      await loadReminders();
+    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
+  });
+}
+
+function renderReminders() {
+  const list = document.getElementById('reminders-list');
+  const empty = document.getElementById('reminders-empty');
+  
+  if (reminders.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  
+  list.innerHTML = reminders.map(r => `
+    <div class="reminder-item ${r.done ? 'done' : ''}">
+      <input type="checkbox" ${r.done ? 'checked' : ''} onchange="toggleReminder(${r.id})" style="margin-right:12px; width:20px; height:20px; cursor:pointer;">
+      <div class="reminder-text">
+        <div class="reminder-date">📅 ${r.date}</div>
+        <div><strong>${escapeHtml(r.description)}</strong> — ${fmt(r.amount)} ₽</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteReminder(${r.id})">×</button>
+    </div>
   `).join('');
 }
 
-function openIncomeModal(id=null) {
-  document.getElementById('income-edit-id').value = id || '';
-  document.getElementById('income-modal-title').textContent = id ? 'Редактировать доход' : 'Добавить доход';
-  if (id) {
-    const inc = incomes.find(i=>i.id===id);
-    if (inc) {
-      document.getElementById('f-desc').value = inc.description;
-      document.getElementById('f-amount').value = inc.amount;
-      document.getElementById('f-date').value = inc.date;
-      document.getElementById('f-type').value = inc.clientType;
-    }
-  } else {
-    document.getElementById('f-desc').value='';
-    document.getElementById('f-amount').value='';
-    document.getElementById('f-date').value=today();
-    document.getElementById('f-type').value='individual';
-  }
-  clearErrors(['desc','amount']);
-  openModal('income-modal');
-}
-
-function editIncome(id) { openIncomeModal(id); }
-
-function submitIncome() {
-  const desc = document.getElementById('f-desc').value.trim();
-  const amount = parseFloat(document.getElementById('f-amount').value);
-  const date = document.getElementById('f-date').value;
-  const type = document.getElementById('f-type').value;
-  let valid = true;
-  if (desc.length<5) { showError('desc','Минимум 5 символов'); valid=false; } else hideError('desc');
-  if (!amount || amount<=0) { showError('amount','Введите сумму больше 0'); valid=false; } else hideError('amount');
-  if (!valid) return;
-
-  const editId = document.getElementById('income-edit-id').value;
-  if (editId) {
-    incomes = incomes.map(i => i.id==editId ? {...i, description:desc, amount, date, clientType:type, taxRate:type==='individual'?4:6} : i);
-    toast('Доход обновлён','blue');
-  } else {
-    const inc = {id:Date.now(), date, description:desc, amount, clientType:type, taxRate:type==='individual'?4:6, createdAt:new Date().toISOString()};
-    incomes.push(inc);
-    toast('Доход добавлен','green');
-  }
-  S.set('incomes', incomes);
-  closeModal('income-modal');
-  renderIncomes();
-  updateBadges();
-}
-
-function exportCSV() {
-  const filtered = getFilteredIncomes();
-  if (!filtered.length) { toast('Нет данных для экспорта','red'); return; }
-  const rows = [['Дата','Описание','Сумма (₽)','Тип клиента','Ставка (%)','Налог (₽)']];
-  filtered.forEach(i => rows.push([i.date, i.description, i.amount, i.clientType==='individual'?'Физлицо':'Юрлицо', i.taxRate, Math.round(i.amount*i.taxRate/100)]));
-  const csv = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='доходы.csv'; a.click();
-  URL.revokeObjectURL(url);
-  toast('CSV скачан','green');
-}
-
-// ============ CALCULATOR ============
-function calcTax() {
-  let amount = parseFloat(document.getElementById('calc-amount').value);
-  const rateEl = document.getElementById('calc-rate').value;
-  let rate;
-
-  if (rateEl==='auto') {
-    const {y} = nowMonthYear();
-    const totalInd = incomes.filter(i=>new Date(i.date).getFullYear()===y && i.clientType==='individual').reduce((s,i)=>s+i.amount,0);
-    const totalLeg = incomes.filter(i=>new Date(i.date).getFullYear()===y && i.clientType==='legal').reduce((s,i)=>s+i.amount,0);
-    rate = totalLeg > totalInd ? 6 : 4;
-    if (!amount) amount = totalInd + totalLeg;
-  } else {
-    rate = parseInt(rateEl);
-  }
-  if (!amount || amount<=0) { toast('Введите сумму','red'); return; }
-
-  const tax = amount * rate/100;
+// ============ КАЛЬКУЛЯТОР ============
+function calculateTax() {
+  const amount = parseFloat(document.getElementById('calc-amount').value);
+  const rate = parseInt(document.getElementById('calc-rate').value);
+  if (!amount || amount <= 0) { toast('Введите сумму', 'red'); return; }
+  
+  const tax = amount * rate / 100;
   const net = amount - tax;
-
-  document.getElementById('cr-income').textContent = fmt(amount)+' ₽';
-  document.getElementById('cr-rate').textContent = rate+'%';
-  document.getElementById('cr-tax').textContent = fmt(tax)+' ₽';
-  document.getElementById('cr-net').textContent = fmt(net)+' ₽';
-  document.getElementById('calc-result').style.display='block';
-  document.getElementById('btn-gen-receipt').style.display='block';
-  document.getElementById('calc-warn').style.display = amount>2400000 ? 'block' : 'none';
-
-  window._lastCalc = {amount, rate, tax, net};
+  
+  document.getElementById('calc-r-amount').textContent = fmt(amount) + ' ₽';
+  document.getElementById('calc-r-tax').textContent = rate + '% / ' + fmt(tax) + ' ₽';
+  document.getElementById('calc-r-net').textContent = fmt(net) + ' ₽';
+  document.getElementById('calc-limit-warning').style.display = amount > 2400000 ? 'block' : 'none';
+  document.getElementById('calc-result').style.display = 'block';
 }
 
-function renderLimitBar() {
-  const {y} = nowMonthYear();
-  const yearTotal = incomes.filter(i=>new Date(i.date).getFullYear()===y).reduce((s,i)=>s+i.amount,0);
-  const limit = 2400000;
-  const pct = Math.min(yearTotal/limit*100, 100);
-  const warn = pct > 80;
-  document.getElementById('limit-bar').innerHTML = `
-    <div class="progress-wrap">
-      <div class="progress-track"><div class="progress-fill ${warn?'warn':''}" style="width:${pct}%"></div></div>
-      <div class="progress-labels"><span>Использовано ${fmt(yearTotal)} ₽</span><span>${Math.round(pct)}%</span></div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Остаток: ${fmt(limit-yearTotal)} ₽</div>
-    </div>
-  `;
-  const yearTax = incomes.filter(i=>new Date(i.date).getFullYear()===y).reduce((s,i)=>s+i.amount*i.taxRate/100,0);
-  document.getElementById('year-stats').innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:var(--text-muted)">Доход</span><strong>${fmt(yearTotal)} ₽</strong></div>
-      <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:var(--text-muted)">Налог</span><strong style="color:var(--warn)">${fmt(yearTax)} ₽</strong></div>
-      <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:var(--text-muted)">Чистый доход</span><strong style="color:var(--accent)">${fmt(yearTotal-yearTax)} ₽</strong></div>
-    </div>
-  `;
-}
-
-function generateReceipt() {
-  if (!window._lastCalc) return;
-  const {amount, rate, tax, net} = window._lastCalc;
-  const d = new Date().toLocaleDateString('ru-RU');
-  const content = `ЧЕК САМОЗАНЯТОГО\n═══════════════════════\nДата: ${d}\nСумма: ${fmt(amount)} ₽\nСтавка НПД: ${rate}%\nНалог: ${fmt(tax)} ₽\nЧистый доход: ${fmt(net)} ₽\n═══════════════════════\nСформировано приложением\n«Помощник самозанятого»\n\n[QR-код для проверки]\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n▓ ▓         ▓ ▓\n▓ ▓▓▓▓▓▓▓ ▓ ▓\n▓ ▓     ▓ ▓ ▓\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓`;
-  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`чек_${d.replace(/\./g,'-')}.txt`; a.click();
-  URL.revokeObjectURL(url);
-  toast('Чек сформирован','green');
-}
-
-// ============ AI CHAT ============
-const SYSTEM_PROMPT = `Ты эксперт по самозанятости (НПД) в России. Отвечай на вопросы о:
-- Регистрации через приложение «Мой налог»
-- Налоговых ставках: 4% (физлица), 6% (юрлица)
-- Ограничениях: доход до 2.4 млн ₽ в год, нельзя нанимать сотрудников, перепродавать товары
-- Налоговых вычетах: 10 000 ₽ на первый год
-- Чеках: обязательная выдача через приложение «Мой налог»
-Отвечай конкретно, дружелюбно, с примерами. Используй простой язык. Максимум 300 слов.`;
-
-function renderChat() {
-  const el = document.getElementById('chat-messages');
-  if (!chatHistory.length) {
-    el.innerHTML = '<div class="chat-msg bot">👋 Привет! Я ваш помощник по вопросам самозанятости. Задайте любой вопрос о регистрации, налогах, ограничениях и чеках.</div>';
-    return;
-  }
-  el.innerHTML = chatHistory.map(m=>`<div class="chat-msg ${m.role==='user'?'user':'bot'}">${m.text}</div>`).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-function chatKeydown(e) {
-  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-}
-
-function autoResize(el) {
-  el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px';
-}
-
+// ============ AI ЧАТ ============
 async function sendChat() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
-  input.value=''; input.style.height='auto';
+  
+  input.value = '';
   appendMsg('user', text);
-  chatHistory.push({role:'user', text});
   showTyping();
+  
   try {
-    const reply = await fetchAI(text);
+    const res = await api('/chat/send', 'POST', { text });
+    const data = await res.json();
     removeTyping();
-    appendMsg('bot', reply);
-    chatHistory.push({role:'assistant', text:reply});
-    if (chatHistory.length>40) chatHistory=chatHistory.slice(-40);
-    S.set('chatHistory', chatHistory);
-  } catch(err) {
+    appendMsg('bot', data.reply);
+  } catch (e) {
     removeTyping();
-    const msg = err.message.includes('401')||err.message.includes('403') ? 'Ошибка: проверьте API ключ.' :
-      err.message.includes('CORS')||err.message.includes('Failed to fetch') ? 'Ошибка CORS. Используйте прокси-сервер или проверьте подключение.' :
-      err.message.includes('429') ? 'Превышен лимит запросов. Подождите немного.' :
-      'Ошибка сети. Проверьте подключение и настройки API.';
-    appendMsg('bot', '⚠️ '+msg+'\n\n💡 Настройте API ключ YandexGPT через кнопку «Настройки API» в правом верхнем углу.');
+    appendMsg('bot', '⚠️ Ошибка: ' + e.message);
   }
 }
 
-function sendQuick(q) {
-  document.getElementById('chat-input').value = q;
+function askQuick(text) {
+  document.getElementById('chat-input').value = text;
   sendChat();
 }
 
-async function fetchAI(userText) {
-  const apiKey = S.raw('yandexApiKey');
-  const folderId = S.raw('yandexFolderId');
-  const proxyUrl = S.raw('yandexProxyUrl');
-
-  if (!apiKey || !folderId) {
-    // Demo fallback
-    return getDemoReply(userText);
-  }
-
-  const url = proxyUrl || 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion';
-  const msgs = [{role:'system',text:SYSTEM_PROMPT}];
-  chatHistory.slice(-6).forEach(m=>msgs.push({role:m.role==='user'?'user':'assistant', text:m.text}));
-  msgs.push({role:'user', text:userText});
-
-  const res = await fetch(url, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Api-Key ${apiKey}`},
-    body:JSON.stringify({
-      modelUri:`gpt://${folderId}/yandexgpt/latest`,
-      completionOptions:{stream:false,temperature:0.6,maxTokens:800},
-      messages:msgs
-    })
+async function clearChat() {
+  showConfirm('Очистить историю чата?', async () => {
+    try {
+      await api('/chat/clear', 'DELETE');
+      chatHistory = [];
+      document.getElementById('chat-messages').innerHTML = '';
+      toast('Чат очищен', 'green');
+    } catch (e) { toast('Ошибка: ' + e.message, 'red'); }
   });
-  if (!res.ok) throw new Error(String(res.status));
-  const data = await res.json();
-  return data.result?.alternatives?.[0]?.message?.text || 'Нет ответа от API';
-}
-
-const DEMO_ANSWERS = {
-  register: 'Для регистрации как самозанятый:\n1. Скачайте приложение «Мой налог» (App Store / Google Play)\n2. Зарегистрируйтесь через паспорт или Госуслуги — займёт 5 минут\n3. Выберите виды деятельности\n4. Начните работать и выдавать чеки!\n\n💡 Никаких налоговых органов посещать не нужно.',
-  tax: 'Самозанятые платят НПД (налог на профессиональный доход):\n• 4% — с доходов от физических лиц\n• 6% — с доходов от юридических лиц и ИП\n\n💰 Бонус для новичков: налоговый вычет 10 000 ₽ — первые месяцы ставка будет 3% и 4% соответственно.',
-  limits: 'Основные ограничения самозанятого:\n• Доход не более 2 400 000 ₽ в год\n• Нельзя нанимать сотрудников\n• Нельзя перепродавать товары\n• Нельзя добывать полезные ископаемые\n• Нельзя работать агентом/комиссионером\n\n⚠️ При превышении лимита нужно перейти на ИП или ООО.',
-  kassa: 'Онлайн-касса для самозанятых НЕ НУЖНА! 🎉\n\nВместо кассы вы используете приложение «Мой налог»:\n1. После получения оплаты откройте приложение\n2. Введите сумму и описание услуги\n3. Приложение автоматически сформирует чек\n4. Отправьте чек клиенту (ссылка или PDF)\n\nШтраф за невыдачу чека — 20% от суммы.',
-};
-
-function getDemoReply(text) {
-  const t = text.toLowerCase();
-  if (t.includes('регист') || t.includes('как стать') || t.includes('как оформить')) return DEMO_ANSWERS.register;
-  if (t.includes('налог') || t.includes('ставк') || t.includes('плачу') || t.includes('процент')) return DEMO_ANSWERS.tax;
-  if (t.includes('ограничени') || t.includes('лимит') || t.includes('нельзя') || t.includes('запрет')) return DEMO_ANSWERS.limits;
-  if (t.includes('касс') || t.includes('чек') || t.includes('Receipt')) return DEMO_ANSWERS.kassa;
-  return `Спасибо за вопрос! Для полноценных ответов настройте YandexGPT API через кнопку «⚙️ Настройки API».\n\nПока могу ответить на базовые вопросы:\n• «Как зарегистрироваться?»\n• «Какой налог я плачу?»\n• «Какие ограничения?»\n• «Нужна ли касса?»`;
 }
 
 function appendMsg(role, text) {
-  const el = document.getElementById('chat-messages');
+  const container = document.getElementById('chat-messages');
   const div = document.createElement('div');
-  div.className = 'chat-msg '+role;
-  div.style.whiteSpace = 'pre-wrap';
+  div.className = 'msg ' + role;
   div.textContent = text;
-  el.appendChild(div);
-  el.scrollTop = el.scrollHeight;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
 }
 
 function showTyping() {
-  const el = document.getElementById('chat-messages');
+  const container = document.getElementById('chat-messages');
   const div = document.createElement('div');
-  div.className='chat-msg bot typing'; div.id='typing-indicator';
-  div.innerHTML='<span></span><span></span><span></span>';
-  el.appendChild(div); el.scrollTop=el.scrollHeight;
+  div.className = 'msg bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<em>Печатает...</em>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
 }
 
 function removeTyping() {
-  document.getElementById('typing-indicator')?.remove();
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
 }
 
-function clearChat() {
-  chatHistory = []; S.set('chatHistory',[]);
-  renderChat();
-  toast('История очищена','blue');
+function renderChatHistory() {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = '';
+  chatHistory.forEach(m => appendMsg(m.role === 'assistant' ? 'bot' : 'user', m.text));
 }
 
-function openApiModal() {
-  document.getElementById('api-key').value = S.raw('yandexApiKey');
-  document.getElementById('api-folder').value = S.raw('yandexFolderId');
-  document.getElementById('api-proxy').value = S.raw('yandexProxyUrl');
-  document.getElementById('api-status').textContent='';
-  openModal('api-modal');
-}
-
-function saveApiSettings() {
-  S.setRaw('yandexApiKey', document.getElementById('api-key').value.trim());
-  S.setRaw('yandexFolderId', document.getElementById('api-folder').value.trim());
-  S.setRaw('yandexProxyUrl', document.getElementById('api-proxy').value.trim());
-  closeModal('api-modal');
-  toast('Настройки сохранены','blue');
-}
-
-async function testApi() {
-  const statusEl = document.getElementById('api-status');
-  statusEl.textContent = '⏳ Проверяю...';
-  statusEl.style.color = 'var(--text-muted)';
-  const apiKey = document.getElementById('api-key').value.trim();
-  const folderId = document.getElementById('api-folder').value.trim();
-  const proxyUrl = document.getElementById('api-proxy').value.trim();
-  if (!apiKey || !folderId) { statusEl.textContent='⚠️ Заполните API ключ и Folder ID'; statusEl.style.color='var(--warn)'; return; }
+// ============ ЭКСПОРТ CSV ============
+async function exportCSV() {
   try {
-    const url = proxyUrl || 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion';
-    const res = await fetch(url, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Api-Key ${apiKey}`},
-      body:JSON.stringify({modelUri:`gpt://${folderId}/yandexgpt/latest`,completionOptions:{stream:false,temperature:0.5,maxTokens:50},messages:[{role:'user',text:'Привет'}]})
+    const res = await fetch(`${API_URL}/export/csv`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
     });
-    if (res.ok) { statusEl.textContent='✅ Подключение успешно!'; statusEl.style.color='var(--accent)'; }
-    else { statusEl.textContent=`❌ Ошибка ${res.status}: проверьте ключ`; statusEl.style.color='var(--danger)'; }
-  } catch(e) {
-    statusEl.textContent='❌ Ошибка подключения. Проверьте прокси.';
-    statusEl.style.color='var(--danger)';
-  }
+    if (!res.ok) throw new Error('Ошибка экспорта');
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'incomes.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast('CSV скачан', 'green');
+  } catch (e) { toast(e.message, 'red'); }
 }
 
-// ============ REMINDERS ============
-function renderReminders() {
-  const el = document.getElementById('reminders-list');
-  const empty = document.getElementById('reminders-empty');
-  const now = new Date(); now.setHours(0,0,0,0);
-  const todayStr = today();
-
-  if (!reminders.length) { el.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-
-  const sorted = [...reminders].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  el.innerHTML = sorted.map(r => {
-    const d = new Date(r.date); d.setHours(0,0,0,0);
-    const status = r.done ? 'done' : d < now ? 'past' : d.getTime()===now.getTime() ? 'today' : 'future';
-    const dotClass = status==='done' ? 'future' : status;
-    const statusLabel = status==='past'?'⚠️ Просрочено':status==='today'?'📅 Сегодня':'✅ Будущее';
-    return `
-      <div class="reminder-item ${r.done?'done':''}">
-        <div class="reminder-dot ${dotClass}"></div>
-        <input type="checkbox" ${r.done?'checked':''} onchange="toggleReminder(${r.id},this.checked)" style="flex-shrink:0">
-        <div class="reminder-info">
-          <div class="reminder-date">${fmtDate(r.date)} · ${statusLabel}</div>
-          <div class="reminder-desc" style="${r.done?'text-decoration:line-through':''}">${r.description}</div>
-          <div class="reminder-amount">${fmt(r.amount)} ₽</div>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="confirmDelete('reminder',${r.id})">🗑</button>
-      </div>
-    `;
-  }).join('');
+// ============ УТИЛИТЫ ============
+function fmt(n) {
+  return new Intl.NumberFormat('ru-RU').format(Math.round(n || 0));
 }
 
-function openReminderModal() {
-  document.getElementById('r-date').value='';
-  document.getElementById('r-amount').value='';
-  document.getElementById('r-desc').value='';
-  clearErrors(['r-date','r-amount','r-desc']);
-  openModal('reminder-modal');
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
-function submitReminder() {
-  const date = document.getElementById('r-date').value;
-  const amount = parseFloat(document.getElementById('r-amount').value);
-  const desc = document.getElementById('r-desc').value.trim();
-  let valid=true;
-  if (!date) { showError('r-date','Укажите дату'); valid=false; } else hideError('r-date');
-  if (!amount||amount<=0) { showError('r-amount','Введите сумму'); valid=false; } else hideError('r-amount');
-  if (!desc) { showError('r-desc','Обязательное поле'); valid=false; } else hideError('r-desc');
-  if (!valid) return;
-  reminders.push({id:Date.now(), date, amount, description:desc, done:false});
-  S.set('reminders', reminders);
-  closeModal('reminder-modal');
-  renderReminders();
-  updateBadges();
-  toast('Напоминание добавлено','green');
-}
-
-function toggleReminder(id, done) {
-  reminders = reminders.map(r=>r.id===id?{...r,done}:r);
-  S.set('reminders', reminders);
-  updateBadges();
-}
-
-// ============ INFO FAQ ============
-const FAQ = [
-  ['Можно ли совмещать с работой по ТК?','Да! Можно работать по трудовому договору и параллельно быть самозанятым. Главное — не оказывать услуги своему работодателю (и бывшему в течение 2 лет).'],
-  ['Нужна ли онлайн-касса?','Нет! Достаточно приложения «Мой налог» для формирования чеков.'],
-  ['Как платить налог?','Автоматически через приложение «Мой налог». Налог рассчитывается ежемесячно и приходит уведомлением. Срок оплаты — до 28-го числа следующего месяца.'],
-  ['Что если превысил лимит 2.4 млн?','Нужно перейти на другую систему: зарегистрировать ИП (УСН, ОСНО и т.д.) или ООО.'],
-  ['Можно ли работать с иностранными клиентами?','Да! Но налог нужно платить в России по стандартным ставкам (4% или 6%).'],
-  ['Нужен ли расчётный счёт?','Нет! Можно получать деньги на обычную карту физического лица.'],
-  ['Как закрыть самозанятость?','Через приложение «Мой налог»: Профиль → Сняться с учёта. Или через nalog.ru.'],
-  ['Есть ли налоговые вычеты?','Да! Единоразовый вычет 10 000 ₽: первые месяцы ставка снижается до 3% (физлица) и 4% (юрлица).'],
-  ['Какие штрафы предусмотрены?','За невыдачу чека: 20% от суммы (минимум 1 000 ₽) при первом нарушении; 100% при повторном в течение 6 месяцев.'],
-  ['Можно ли перейти на другую систему?','Да, в любое время. Сниметесь с учёта как самозанятый и зарегистрируетесь как ИП или ООО.'],
-];
-
-function renderFAQ() {
-  const el = document.getElementById('faq-list');
-  if (el.children.length) return;
-  el.innerHTML = FAQ.map((f,i)=>`
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFAQ(${i})">
-        <span>${f[0]}</span><span id="faq-arrow-${i}">▼</span>
-      </div>
-      <div class="faq-a" id="faq-a-${i}">${f[1]}</div>
-    </div>
-  `).join('');
-}
-
-function toggleFAQ(i) {
-  const a = document.getElementById('faq-a-'+i);
-  const ar = document.getElementById('faq-arrow-'+i);
-  const open = a.classList.toggle('open');
-  ar.textContent = open ? '▲' : '▼';
-}
-
-// ============ MODALS ============
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
-});
-
-// ============ CONFIRM DELETE ============
-function confirmDelete(type, id) {
-  document.getElementById('confirm-text').textContent = type==='income' ? 'Удалить эту запись о доходе?' : 'Удалить это напоминание?';
-  openModal('confirm-modal');
-  document.getElementById('confirm-ok').onclick = () => {
-    if (type==='income') { incomes=incomes.filter(i=>i.id!==id); S.set('incomes',incomes); renderIncomes(); renderDashboard(); toast('Доход удалён','red'); }
-    if (type==='reminder') { reminders=reminders.filter(r=>r.id!==id); S.set('reminders',reminders); renderReminders(); toast('Напоминание удалено','red'); }
-    updateBadges();
-    closeModal('confirm-modal');
-  };
-}
-
-// ============ VALIDATION ============
-function showError(field, msg) {
-  document.getElementById('f-'+field)?.classList.add('error');
-  document.getElementById('r-'+field)?.classList.add('error');
-  const e = document.getElementById('e-'+field) || document.getElementById('e-r-'+field);
-  if (e) { e.textContent=msg; e.classList.add('show'); }
-}
-function hideError(field) {
-  document.getElementById('f-'+field)?.classList.remove('error');
-  document.getElementById('r-'+field)?.classList.remove('error');
-  const e = document.getElementById('e-'+field) || document.getElementById('e-r-'+field);
-  if (e) e.classList.remove('show');
-}
-function clearErrors(fields) { fields.forEach(f=>hideError(f)); }
-
-// ============ TOAST ============
-function toast(msg, type='green') {
-  const c = document.getElementById('toasts');
+function toast(msg, color = 'blue') {
   const t = document.createElement('div');
-  t.className=`toast ${type}`;
-  t.innerHTML = (type==='green'?'✓':type==='red'?'✕':'ℹ')+` ${msg}`;
-  c.appendChild(t);
-  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),300); }, 3000);
+  t.className = 'toast ' + color;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-// ============ BADGES ============
-function updateBadges() {
-  const now = new Date(); now.setHours(0,0,0,0);
-  const overdue = reminders.filter(r=>!r.done && new Date(r.date)<now).length;
-  const badge = document.getElementById('nav-reminders');
-  const bnav = document.getElementById('bnav-reminders');
-
-  const existing = badge.querySelector('.nav-badge');
-  if (existing) existing.remove();
-  const bex = bnav.querySelector('.bnav-badge');
-  if (bex) bex.remove();
-
-  if (overdue) {
-    const b = document.createElement('span');
-    b.className='nav-badge'; b.textContent=overdue;
-    badge.appendChild(b);
-    const bb = document.createElement('span');
-    bb.className='bnav-badge'; bb.textContent=overdue;
-    bnav.appendChild(bb);
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  if (id === 'income-modal') {
+    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
   }
 }
 
-// ============ INIT ============
-function init() {
-  renderDashboard();
-  renderLimitBar();
-  updateBadges();
-
-  // Check overdue reminders
-  const now = new Date(); now.setHours(0,0,0,0);
-  const overdue = reminders.filter(r=>!r.done && new Date(r.date)<now).length;
-  if (overdue) {
-    setTimeout(()=> toast(`⚠️ У вас ${overdue} просроченных напоминаний!`,'red'), 800);
-  }
-
-  // Set today's date defaults
-  document.getElementById('f-date').value = today();
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
 }
 
-init();
+function showConfirm(text, onConfirm) {
+  document.getElementById('confirm-text').textContent = text;
+  const btn = document.getElementById('confirm-btn');
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+  newBtn.onclick = () => { onConfirm(); closeModal('confirm-modal'); };
+  openModal('confirm-modal');
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+}
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+document.querySelectorAll('.filter-btn[data-filter-period]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-filter-period]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterPeriod = btn.dataset.filterPeriod;
+    loadIncomes();
+  });
+});
+
+document.querySelectorAll('.filter-btn[data-filter-client]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-filter-client]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterClient = btn.dataset.filterClient;
+    loadIncomes();
+  });
+});
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  document.getElementById('user-email-display').textContent = userEmail || '';
+  loadIncomes();
+  loadReminders();
+  loadStats();
+  loadChatHistory();
+}
+
+window.onload = () => {
+  if (authToken) showApp();
+  else document.getElementById('login-screen').style.display = 'flex';
+};
 </script>
+
 </body>
 </html>
